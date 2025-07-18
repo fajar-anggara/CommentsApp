@@ -1,0 +1,21 @@
+<?php
+
+namespace App\Transformer;
+
+use App\Models\Badge;
+use League\Fractal\TransformerAbstract;
+
+class BadgeTransformer extends TransformerAbstract
+{
+    public function transform(Badge $badge): array
+    {
+        return [
+            'id'          => (string) $badge->id,
+            'name'        => (string) $badge->name,
+            'avatar_url'  => (string) $badge->avatar_url,
+            'description' => (string) $badge->description,
+            'created_at'  => (string) $badge->created_at->toIso8601String(),
+            'updated_at'  => (string) $badge->updated_at->toIso8601String(),
+        ];
+    }
+}
