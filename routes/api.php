@@ -124,3 +124,4 @@ Route::middleware(['auth:sanctum'])->group(function () {
 // Health check and system status
 //Route::get('/health', 'System@health')->name('system.health');
 //Route::get('/status', 'System@status')->name('system.status');
+
