@@ -12,6 +12,7 @@
         "laravel/sanctum": "^4.0",
         "laravel/telescope": "^5.10",
         "laravel/tinker": "^2.10.1",
+        "league/fractal": "^0.20.2",
         "spatie/laravel-permission": "^6.20"
     },
     "require-dev": {
