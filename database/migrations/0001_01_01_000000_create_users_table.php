@@ -25,10 +25,11 @@ return new class extends Migration
             $table->integer('total_likes_acquired')->default(0);
             $table->boolean('is_muted')->default(false);
             $table->boolean('is_banned')->default(false);
+            $table->uuid('badge_id')->nullable();
 
-            $table->foreignId('badge_id')
-                ->nullable()
-                ->constrained();
+            $table->foreign('badge_id')
+                ->on('badges')
+                ->references('id');
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

@@ -11,9 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('statistics_user', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->foreignId('user_id')->constrained();
+        Schema::create('statistic_users', function (Blueprint $table) {
+            $table->id();
+            $table->uuid('user_id');
+            $table->foreign('user_id')->references('id')->on('users');
             $table->integer('total_comments_created')->default(0);
             $table->integer('total_upVote_comments')->default(0);
             $table->integer('total_downVote_comments')->default(0);
@@ -30,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('statistics_user');
+        Schema::dropIfExists('statistic_users');
     }
 };

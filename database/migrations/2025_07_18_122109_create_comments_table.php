@@ -11,15 +11,16 @@ return new class extends Migration
         Schema::create('comments', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->unsignedBigInteger('article_id');
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->uuid('user_id');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->text('content');
             $table->uuid('parent_id')->nullable();
             $table->enum('status', ['published', 'hidden', 'deleted'])->default('published');
 
             $table->unsignedInteger('likes_count')->default(0);
             $table->unsignedInteger('reports_count')->default(0);
-            $table->unsignedInteger('upVotes_count')->default(0);
-            $table->unsignedInteger('downVotes_count')->default(0);
+            $table->unsignedInteger('upvotes_count')->default(0);
+            $table->unsignedInteger('downvotes_count')->default(0);
 
             $table->timestamps();
 
