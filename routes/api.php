@@ -114,12 +114,12 @@ Route::middleware(['auth:sanctum', 'permission:view analytics'])->group(function
 });
 
 // Notification system
-Route::middleware(['auth:sanctum'])->group(function () {
-    Route::get('/notifications', 'Notification@getNotifications')->name('notifications.get');
-    Route::post('/notifications/{notificationId}/read', 'Notification@markAsRead')->name('notifications.markAsRead');
-    Route::post('/notifications/read-all', 'Notification@markAllAsRead')->name('notifications.markAllAsRead');
-    Route::delete('/notifications/{notificationId}', 'Notification@deleteNotification')->name('notifications.delete');
-});
+//Route::middleware(['auth:sanctum'])->group(function () {
+//    Route::get('/notifications', 'Notification@getNotifications')->name('notifications.get');
+//    Route::post('/notifications/{notificationId}/read', 'Notification@markAsRead')->name('notifications.markAsRead');
+//    Route::post('/notifications/read-all', 'Notification@markAllAsRead')->name('notifications.markAllAsRead');
+//    Route::delete('/notifications/{notificationId}', 'Notification@deleteNotification')->name('notifications.delete');
+//});
 
 // Health check and system status
 //Route::get('/health', 'System@health')->name('system.health');
