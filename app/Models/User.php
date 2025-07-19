@@ -6,18 +6,21 @@ namespace App\Models;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\LaravelPackageTools\Concerns\Package\HasAssets;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable
+class User extends Model
 {
     /** @use HasFactory<UserFactory> */
-    use HasUuids, HasApiTokens, HasRoles, HasAssets, Notifiable, HasFactory;
+    use HasUuids, HasApiTokens, HasRoles, HasAssets, Notifiable, HasFactory, LogsActivity;
 
     protected $keyType = 'string';
     public $incrementing = false;
@@ -41,6 +44,8 @@ class User extends Authenticatable
         'password',
         'remember_token',
     ];
+
+    protected $guard_name = 'sanctum';
 
     /**
      * Get the attributes that should be cast.
@@ -88,5 +93,11 @@ class User extends Authenticatable
     public function statistics(): HasMany
     {
         return $this->hasMany(StatisticUser::class);
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['name', 'text']);
     }
 }

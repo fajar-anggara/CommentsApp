@@ -4,7 +4,7 @@ namespace App\Repositories\DatabaseImplementers;
 
 use App\Models\User;
 use App\Repositories\Interfaces\AuthenticationRepository;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Model;
 use Ramsey\Uuid\Uuid;
 
 class AuthenticationImpl implements AuthenticationRepository
@@ -13,8 +13,10 @@ class AuthenticationImpl implements AuthenticationRepository
     public function addNewCommenter(array $user): User
     {
         $user['id'] = Uuid::uuid4()->toString();
-        $id = DB::table("users")->insertGetId($user);
-        return User::query()->find($user['id'])->first();
+        $savedUser = User::create($user);
+        $savedUser->assignRole('commenter');
+
+        return $savedUser;
     }
 
     public function deleteCommenter(User $user): bool
