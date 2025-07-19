@@ -5,22 +5,22 @@ Sebuah backend app untuk aplikasi management komentar universal
 ## About
 
 Ini merupakan apikasi REST API untuk memanage komentar seperti discuss. yang nantinya akan di embbed oleh front-end secara terpisah.
-- upcomming
+- User Management (baru User Register)
 
 ## Features
 
 ### Sudah terbangun
 
-- none
+- User Register
 
 ### Sedang dikerjakan
 
-- none
+- User Login
 
 ## Current Status
 
 Yang sudah terimplementasi dan di test mengguakan insomnia:
-- none
+- User Register
 
 
 ## API Documentation
