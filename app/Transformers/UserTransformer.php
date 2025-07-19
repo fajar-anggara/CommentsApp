@@ -16,12 +16,21 @@ class UserTransformer extends TransformerAbstract
         'statistics'
     ];
 
+    private $token;
+
+    public function setToken(String $token = null): static
+    {
+        $this->token = $token;
+        return $this;
+    }
+
     public function transform(User $user): array
     {
         return [
             'id'                     => (string) $user->id,
             'name'                   => (string) $user->name,
             'avatar_url'             => (string) $user->avatar_url,
+            'token'                  => $this->token,
         ];
     }
 

@@ -19,6 +19,8 @@ class User extends Authenticatable
     /** @use HasFactory<UserFactory> */
     use HasUuids, HasApiTokens, HasRoles, HasAssets, Notifiable, HasFactory;
 
+    protected $keyType = 'string';
+    public $incrementing = false;
     /**
      * The attributes that are mass assignable.
      *
