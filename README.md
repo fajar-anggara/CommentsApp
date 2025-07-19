@@ -1,4 +1,4 @@
-# CMS Backend API
+# Universal Comments App 
 
 Sebuah backend app untuk aplikasi management komentar universal
 
