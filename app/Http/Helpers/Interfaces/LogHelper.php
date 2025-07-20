@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 interface LogHelper
 {
-    public function performedOn(Model $model): LogHelper;
+    public function performedOn(string $model): LogHelper;
     public function causedBy(array $causer): LogHelper;
     public function withProperties(array $properties): LogHelper;
     public function withEvent(string $event): LogHelper;

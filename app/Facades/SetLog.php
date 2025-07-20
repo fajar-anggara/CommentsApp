@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static withProperties(array $properties): LogHelper
  * @method static withMessage(string $message): LogHelper
  * @method static withCausedBy(Model $model): LogHelper
- * @method static performedOn(Model $model): LogHelper
+ * @method static performedOn(string $model): LogHelper
  * @method static build(): void
  * @method static cleanLogs(): void
  */

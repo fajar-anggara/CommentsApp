@@ -9,13 +9,13 @@ class FailedToSavedException extends \Exception
 {
     protected string $jsonMessage;
     protected array $causer;
-    protected Model $performedModel;
+    protected string $performedModel;
     protected int $statusCode = 500;
 
     public function __construct(
         string $jsonMessage = "Terjadi kesalahan, harap coba lagi",
         array $causer  = [],
-        Model $performedOnModel = null,
+        string $performedOnModel = null,
     ) {
         $this->jsonMessage = $jsonMessage;
         $this->causer = $causer;

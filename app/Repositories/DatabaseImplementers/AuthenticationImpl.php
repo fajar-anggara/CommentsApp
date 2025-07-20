@@ -32,7 +32,7 @@ class AuthenticationImpl implements AuthenticationRepository
             throw new FailedToSavedException(
                 "Kesalahan, silahkan coba lagi",
                 $user,
-                $savedUser
+                User::class
             );
         }
         $savedUser->assignRole('commenter');
@@ -65,7 +65,11 @@ class AuthenticationImpl implements AuthenticationRepository
                 ->withMessage('Commenter not found')
                 ->build();
 
-            throw new NotFoundException($email);
+            throw new NotFoundException(
+                "Email atau Nama tidak ditemukan",
+                ['email' => $email],
+                User::class
+            );
         }
 
         return $fetched;

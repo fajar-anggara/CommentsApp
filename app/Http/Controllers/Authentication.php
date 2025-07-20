@@ -8,6 +8,7 @@ use App\Facades\Fractal;
 use App\Facades\SetLog;
 use App\Http\Requests\CommenterLoginRequest;
 use App\Http\Requests\CommenterRegisterRequest;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -40,7 +41,7 @@ class Authentication
             ->withProperties([
                 'time' => now()
             ])
-            ->performedOn($commenter)
+            ->performedOn(User::class)
             ->withMessage('Commenter registered successfully')
             ->build();
 
@@ -86,7 +87,7 @@ class Authentication
             ->withProperties([
                 'time' => now()
             ])
-            ->performedOn($commenter)
+            ->performedOn(User::class)
             ->withMessage('Commenter login successfully')
             ->build();
 
@@ -104,7 +105,6 @@ class Authentication
             ->withProperties([
                 'time' => now()
             ])
-            ->performedOn($request->user())
             ->withMessage('Prepare Logout Commenter')
             ->build();
 
@@ -142,7 +142,6 @@ class Authentication
             ->withProperties([
                 'refresh_at' => now()
             ])
-            ->performedOn($request->user())
             ->withMessage('Refresh token successfully')
             ->build();
 
