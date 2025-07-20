@@ -2,47 +2,51 @@
 
 namespace App\Http\Controllers;
 
-use App\Repositories\Interfaces\AuthenticationRepository;
+use App\Facades\Fractal;
+use App\Facades\SetLog;
+use App\Http\Helpers\Interfaces\LogHelper;
 use App\Http\Requests\CommenterRegisterRequest;
-use App\Transformers\UserTransformer;
+use App\Repositories\Interfaces\AuthenticationRepository;
 use Illuminate\Http\JsonResponse;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Item;
 
 class Authentication
 {
 
-    protected $auth;
-    protected $userTransformer;
-    protected $manager;
-    public function __construct(AuthenticationRepository $auth)
+    protected AuthenticationRepository $auth;
+    protected LogHelper $log;
+    public function __construct(
+        AuthenticationRepository $auth,
+    )
     {
         $this->auth = $auth;
-        $this->userTransformer = new UserTransformer();
-        $this->manager = new Manager();
     }
 
     public function register(CommenterRegisterRequest $request): JsonResponse
     {
-        activity()->withProperties([
-            'name' => $request->get('name'),
-        ])->log('Will Register user');
+        SetLog::witHEvent('Register Commenter')
+            ->withProperties([
+                'name' => $request->get('name'),
+            ])
+            ->withMessage('Prepare to register a new commenter')
+            ->build();
 
         $validated = $request->validated();
         $commenter = $this->auth->addNewCommenter($validated);
-        $token = $commenter->createToken('register_user')->plainTextToken;
+        $token = $commenter->createToken('register_commenter')->plainTextToken;
 
-        $setToken = $this->userTransformer->setToken($token);
-        $resource = new Item($commenter, $setToken);
-        $data = $this->manager->createData($resource)->toArray();
+        $data = Fractal::useCommenterTransformer($commenter, $token)
+            ->withIncludes(['details'])
+            ->buildWithArraySerializer();
 
-        activity()->performedOn($commenter)
-            ->event('Register')
+        SetLog::withEvent('Register Commenter')
             ->withProperties([
                 'name' => $commenter->name,
                 'email' => $commenter->email,
                 'token' => $token,
-            ]);
+            ])
+            ->performedOn($commenter)
+            ->withMessage('commenter registered')
+            ->build();
 
         return response()->json([
             'success' => true,

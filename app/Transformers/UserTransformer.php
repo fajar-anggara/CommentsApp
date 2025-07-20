@@ -13,7 +13,8 @@ class UserTransformer extends TransformerAbstract
     protected array $availableIncludes = [
         'comments',
         'badge',
-        'statistics'
+        'statistics',
+        'details'
     ];
 
     private $token;
