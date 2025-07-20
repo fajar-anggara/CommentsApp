@@ -11,19 +11,17 @@ use App\Http\Controllers\Badge;
 use App\Http\Controllers\Recruiting;
 use App\Http\Controllers\Analytics;
 
-// Current user
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
-
 // Authentication endpoints
 Route::prefix('/auth')->group(function () {
     Route::post('/register', [Authentication::class, 'register'])->name('register');
     Route::post('/login', [Authentication::class, 'login'])->name('login');
-    Route::post('/logout', [Authentication::class, 'logout'])->name('logout');
-    Route::post('/refresh', [Authentication::class, 'refresh'])->name('refresh');
     Route::post('/forgot-password', [Authentication::class, 'forgotPassword'])->name('forgot-password');
     Route::post('/reset-password', [Authentication::class, 'resetPassword'])->name('reset-password');
+
+    Route::middleware(['auth:sanctum'])->group(function () {
+        Route::get('/logout', [Authentication::class, 'logout'])->name('logout');
+        Route::get('/refresh', [Authentication::class, 'refresh'])->name('refresh');
+    });
 
     Route::middleware(['auth:sanctum', 'role:commenter'])->group(function () {
         Route::get('/me', [UserAccess::class, 'me'])->name('me');

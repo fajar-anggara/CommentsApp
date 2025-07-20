@@ -12,7 +12,7 @@ class LogHelperImpl implements LogHelperInterface
     protected ?string $event = null;
     protected array $properties = [];
     protected ?string $message = null;
-    protected ?Model $causedBy = null;
+    protected ?array $causedBy = null;
     protected ?Model $performedOn = null;
 
     public function withEvent(string $event): LogHelperInterface
@@ -33,9 +33,9 @@ class LogHelperImpl implements LogHelperInterface
         return $this;
     }
 
-    public function withCausedBy(Model $model): LogHelperInterface
+    public function causedBy(array $causer): LogHelperInterface
     {
-        $this->causedBy = $model;
+        $this->causedBy = $causer;
         return $this;
     }
 
