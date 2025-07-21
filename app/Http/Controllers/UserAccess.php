@@ -10,9 +10,33 @@ use App\Http\Requests\CommenterUpdateRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Arr;
 
+/**
+ * UserAccess Controller
+ *
+ * Controller for user access related actions
+ */
 class UserAccess
 {
 
+    /**
+     * Get authenticated user's profile information
+     *
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Illuminate\Auth\AuthenticationException
+     *
+     * @response {
+     *   "success": true,
+     *   "message": "Berhasil memuat data",
+     *   "data": {
+     *     "id": 1,
+     *     "name": "John Doe",
+     *     "email": "john@example.com",
+     *     "details": {},
+     *     "statistics": {},
+     *     "comments": []
+     *   }
+     * }
+     */
     public function me(): JsonResponse
     {
         SetLog::withEvent(LogEvents::FETCHING_COMMENTER)
@@ -37,8 +61,22 @@ class UserAccess
     }
 
     /**
-     * @Method PUT
-     * @return JsonResponse
+     * Update authenticated user's profile
+     *
+     * @param CommenterUpdateRequest $request The incoming request containing profile data
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Illuminate\Auth\AuthenticationException
+     *
+     * @response {
+     *   "success": true,
+     *   "message": "Berhasil update data",
+     *   "data": {
+     *     "id": 1,
+     *     "name": "Updated Name",
+     *     "email": "updated@example.com",
+     *     "details": {}
+     *   }
+     * }
      */
     public function profile(CommenterUpdateRequest $request): JsonResponse
     {
@@ -71,6 +109,17 @@ class UserAccess
         ]);
     }
 
+    /**
+     * Delete authenticated user's account
+     *
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Illuminate\Auth\AuthenticationException
+     *
+     * @response {
+     *   "success": true,
+     *   "message": "Account deleted successfully"
+     * }
+     */
     public function deleteAccount()
     {
 
