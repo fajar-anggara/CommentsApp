@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -90,9 +91,9 @@ class User extends Authenticatable
         return $this->hasMany(CommentReport::class);
     }
 
-    public function statistics(): BelongsTo
+    public function statistics(): HasOne
     {
-        return $this->belongsTo(StatisticUser::class);
+        return $this->HasOne(StatisticUser::class);
     }
 
     public function getActivitylogOptions(): LogOptions
