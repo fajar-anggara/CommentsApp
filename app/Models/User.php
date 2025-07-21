@@ -18,6 +18,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\LaravelPackageTools\Concerns\Package\HasAssets;
 use Spatie\Permission\Traits\HasRoles;
 
+#[\AllowDynamicProperties]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */

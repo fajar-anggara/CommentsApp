@@ -22,6 +22,7 @@ class Authentication
     {
         SetLog::withEvent(LogEvents::REGISTER)
             ->causedBy(Arr::only($request->validated(), ['email', 'name']))
+            ->performedOn(Authentication::class)
             ->withMessage('Prepare to register a new commenter')
             ->build();
 
@@ -35,7 +36,7 @@ class Authentication
 
         SetLog::withEvent(LogEvents::REGISTER)
             ->causedBy(Arr::only($validated, ['name', 'email']))
-            ->performedOn(User::class)
+            ->performedOn(Authentication::class)
             ->withMessage('Commenter registered successfully')
             ->build();
 
@@ -53,6 +54,7 @@ class Authentication
     {
         SetLog::withEvent(LogEvents::LOGIN)
             ->causedBy(Arr::only($request->validated(), ['email']))
+            ->performedOn(Authentication::class)
             ->withMessage('Prepare to login a commenter')
             ->build();
 
@@ -62,6 +64,7 @@ class Authentication
         if (!$commenter || !Hash::check($validated['password'], $commenter->password)) {
             SetLog::withEvent(LogEvents::LOGIN)
                 ->withProperties(['email' => $validated["email"]])
+                ->performedOn(Authentication::class)
                 ->withMessage('Commenter login failed: wrong email or password')
                 ->build();
 
@@ -75,7 +78,7 @@ class Authentication
 
         SetLog::withEvent(LogEvents::LOGIN)
             ->causedBy(Arr::only($validated, ['name', 'email']))
-            ->performedOn(User::class)
+            ->performedOn(Authentication::class)
             ->withMessage('Commenter login successfully')
             ->build();
 
@@ -90,6 +93,7 @@ class Authentication
     {
         SetLog::withEvent(LogEvents::LOGOUT)
             ->causedBy(['name' => $request->user()])
+            ->performedOn(Authentication::class)
             ->withMessage('Prepare Logout Commenter')
             ->build();
 
@@ -97,6 +101,7 @@ class Authentication
 
         SetLog::withEvent(LogEvents::LOGOUT)
             ->causedBy(['name' => $request->user()])
+            ->performedOn(Authentication::class)
             ->withMessage('Commenter logout successfully')
             ->build();
 
@@ -110,6 +115,7 @@ class Authentication
     {
         SetLog::withEvent(LogEvents::REFRESH_TOKEN)
             ->causedBy(['name' => $request->user()])
+            ->performedOn(Authentication::class)
             ->withMessage('Prepare refresh token')
             ->build();
 
@@ -118,6 +124,7 @@ class Authentication
 
         SetLog::withEvent(LogEvents::REFRESH_TOKEN)
             ->causedBy(['name' => $request->user()])
+            ->performedOn(Authentication::class)
             ->withMessage('Refresh token successfully')
             ->build();
 

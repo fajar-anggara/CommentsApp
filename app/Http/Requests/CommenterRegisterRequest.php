@@ -25,6 +25,8 @@ class CommenterRegisterRequest extends FormRequest
             'name' => 'required|string|min:3|unique:users,name',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8',
+            'bio' => 'nullable|string',
+            'avatar_url' => 'nullable|string',
         ];
     }
 
@@ -38,7 +40,10 @@ class CommenterRegisterRequest extends FormRequest
             'email.unique' => 'Email sudah terdaftar',
             'email.email' => 'Email tidak valid',
             'password.required' => 'Password tidak boleh kosong',
-            'password.min' => 'Password harus lebih dari 8 karakter'
+            'password.min' => 'Password harus lebih dari 8 karakter',
+            'password.string' => 'Password hanya boleh huruf',
+            'avatar_url.string' => 'Avatar URL hanya boleh huruf',
+            'bio.string' => 'Bio hanya boleh huruf',
         ];
     }
 }

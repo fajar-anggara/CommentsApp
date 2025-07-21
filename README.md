@@ -11,12 +11,12 @@ Ini merupakan apikasi REST API untuk memanage komentar seperti discuss. yang nan
 
 ### Sudah terbangun
 
-- User Register, Login, Logout, get my data
+- CRUD user
 - Refresh API Token
 
 ### Sedang dikerjakan
 
-- User Login
+- Add tenant
 
 ## Current Status
 

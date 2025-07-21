@@ -3,12 +3,14 @@
 namespace App\Facades;
 
 use App\Models\User;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\Facade;
 
 /**
- * @method static addNewCommenter(array $user)
- * @method static deleteCommenter(User $user)
- * @method static findCommenterById(int $id)
+ * @method static addNewCommenter(array $commenter)
+ * @method static updateCommenter(Authenticatable $commenter, array $updateData)
+ * @method static deleteCommenter(User $commenter)
+ * @method static findCommenterById(string $id)
  * @method static findCommenterByEmail(string $email)
  * @method static existsCommenterById(int $id)
  */

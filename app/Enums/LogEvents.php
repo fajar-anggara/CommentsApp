@@ -14,5 +14,6 @@ enum LogEvents: string
     case REGISTER = "Register";
     case LOGIN = "Login";
     case LOGOUT = "Logout";
+    case UPDATE = "Update";
     case REFRESH_TOKEN = "Refresh Token";
 }
