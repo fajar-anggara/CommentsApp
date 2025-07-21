@@ -17,7 +17,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\LaravelPackageTools\Concerns\Package\HasAssets;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Model
+class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
     use HasUuids, HasApiTokens, HasRoles, HasAssets, Notifiable, HasFactory, LogsActivity;
@@ -90,9 +90,9 @@ class User extends Model
         return $this->hasMany(CommentReport::class);
     }
 
-    public function statistics(): HasMany
+    public function statistics(): BelongsTo
     {
-        return $this->hasMany(StatisticUser::class);
+        return $this->belongsTo(StatisticUser::class);
     }
 
     public function getActivitylogOptions(): LogOptions

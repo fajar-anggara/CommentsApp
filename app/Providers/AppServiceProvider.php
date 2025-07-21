@@ -2,8 +2,8 @@
 
 namespace App\Providers;
 
-use App\Http\Helpers\ExactImplementers\FractalHelperImpl;
-use App\Http\Helpers\ExactImplementers\LogHelperImpl;
+use App\Helpers\ExactImplementers\FractalHelperImpl;
+use App\Helpers\ExactImplementers\LogHelperImpl;
 use App\Repositories\DatabaseImplementers\AuthenticationImpl;
 use Illuminate\Support\ServiceProvider;
 

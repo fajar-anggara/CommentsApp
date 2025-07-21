@@ -11,6 +11,9 @@ class Badge extends Model
 {
     use HasUuids, HasFactory;
 
+    protected $keyType = 'string';
+    public $incrementing = false;
+
     protected $fillable = [
         'name',
         'avatar',

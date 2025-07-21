@@ -2,11 +2,16 @@
 
 namespace App\Repositories\DatabaseImplementers;
 
+use App\Enums\Badges;
+use App\Enums\LogEvents;
 use App\Exceptions\NotFoundException;
 use App\Exceptions\FailedToSavedException;
 use App\Facades\SetLog;
+use App\Models\Badge;
+use App\Models\StatisticUser;
 use App\Models\User;
 use App\Repositories\Interfaces\AuthenticationRepository;
+use Illuminate\Support\Arr;
 use Ramsey\Uuid\Uuid;
 
 class AuthenticationImpl implements AuthenticationRepository
@@ -17,15 +22,26 @@ class AuthenticationImpl implements AuthenticationRepository
      */
     public function addNewCommenter(array $user): User
     {
+        $badge = Badge::where('name', Badges::SIDER->value)->first();
+        if (!$badge) {
+            SetLog::withEvent(LogEvents::FETCHING)
+                ->causedBy(['badge_id' => Badges::SIDER->value])
+                ->withMessage('Failed to fetch badge')
+                ->build();
+
+            throw new NotFoundException(
+                "Kesalahan, silahkan coba lagi",
+                ['badge_id' => $badge->id],
+                Badge::class
+            );
+        }
+
         $user['id'] = Uuid::uuid4()->toString();
+        $user['badge_id'] = $badge->id;
         $savedUser = User::create($user);
         if (!$savedUser) {
-            SetLog::withEvent('Register Commenter')
-                ->withProperties([
-                    'name' => $user['name'],
-                    'email' => $user['email'],
-                    'time' => now()
-                ])
+            SetLog::withEvent(LogEvents::STORING)
+                ->causedBy(Arr::only($user, ['name', 'email']))
                 ->withMessage('Failed to create new commenter')
                 ->build();
 
@@ -35,7 +51,23 @@ class AuthenticationImpl implements AuthenticationRepository
                 User::class
             );
         }
+
         $savedUser->assignRole('commenter');
+        $savedStatistic = StatisticUser::create([
+            'user_id' => $savedUser->id,
+        ]);
+        if (!$savedStatistic) {
+            SetLog::withEvent(LogEvents::STORING)
+                ->causedBy(['user_id' => $savedUser->id])
+                ->withMessage('Failed to create statistic for commenter')
+                ->build();
+
+            throw new FailedToSavedException(
+                "Kesalahan, silahkan coba lagi",
+                $user,
+                User::class
+            );
+        }
 
         return $savedUser;
     }
@@ -57,7 +89,7 @@ class AuthenticationImpl implements AuthenticationRepository
     {
         $fetched = User::where('email', $email)->first();
         if (!$fetched) {
-            SetLog::withEvent("find_commenter")
+            SetLog::withEvent(LogEvents::FETCHING_COMMENTER)
                 ->withProperties([
                     "email" => $email,
                     "time" => now()

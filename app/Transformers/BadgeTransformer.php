@@ -12,7 +12,7 @@ class BadgeTransformer extends TransformerAbstract
         return [
             'id'          => (string) $badge->id,
             'name'        => (string) $badge->name,
-            'avatar_url'  => (string) $badge->avatar_url,
+            'avatar'  => (string) $badge->avatar,
             'description' => (string) $badge->description,
             'created_at'  => (string) $badge->created_at->toIso8601String(),
             'updated_at'  => (string) $badge->updated_at->toIso8601String(),

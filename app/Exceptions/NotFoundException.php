@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Exceptions;
+use App\Enums\LogEvents;
 use App\Facades\SetLog;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
@@ -27,12 +28,12 @@ class NotFoundException extends \Exception
             $this->statusCode
         );
 
-        SetLog::withEvent("Fetching")
+        SetLog::withEvent(LogEvents::FETCHING)
             ->causedBy($causer)
             ->performedOn($performedOnModel)
             ->withMessage("Not Found when access: " . $performedOnModel)
             ->withProperties([
-                'time' => now()
+                'exception' => static::class
             ])
             ->build();
     }

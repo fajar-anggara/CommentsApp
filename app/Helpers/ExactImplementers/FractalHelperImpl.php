@@ -1,13 +1,14 @@
 <?php
 
-namespace App\Http\Helpers\ExactImplementers;
+namespace App\Helpers\ExactImplementers;
 
-use App\Http\Helpers\Interfaces\FractalHelper;
+use App\Helpers\Interfaces\FractalHelper;
 use App\Transformers\UserTransformer;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Contracts\Auth\Authenticatable;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
 use League\Fractal\Serializer\ArraySerializer;
+
 
 class FractalHelperImpl implements FractalHelper
 {
@@ -19,7 +20,7 @@ class FractalHelperImpl implements FractalHelper
     protected array $includes = [];
     protected Item $resource;
 
-    public function useCommenterTransformer(Model $commenter, string $token = null): FractalHelper
+    public function useCommenterTransformer(Authenticatable $commenter, string $token = null): FractalHelper
     {
         $transformer = new UserTransformer();
         if ($token) {

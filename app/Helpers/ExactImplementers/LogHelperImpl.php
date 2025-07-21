@@ -1,23 +1,24 @@
 <?php
-namespace App\Http\Helpers\ExactImplementers;
+namespace App\Helpers\ExactImplementers;
 
-use App\Http\Helpers\Interfaces\LogHelper as LogHelperInterface;
-use Spatie\Activitylog\Models\Activity;
+use App\Enums\LogEvents;
+use App\Helpers\Interfaces\LogHelper as LogHelperInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
+use Spatie\Activitylog\Models\Activity;
 
 class LogHelperImpl implements LogHelperInterface
 {
     protected Activity $activity;
-    protected ?string $event = null;
+    protected ?string $event = LogEvents::DEFAULT->value;
     protected array $properties = [];
     protected ?string $message = null;
     protected ?array $causedBy = null;
     protected string $performedOn = '';
 
-    public function withEvent(string $event): LogHelperInterface
+    public function withEvent(LogEvents $event): LogHelperInterface
     {
-        $this->event = $event;
+        $this->event = $event->value;
         return $this;
     }
 

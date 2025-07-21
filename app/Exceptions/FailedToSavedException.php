@@ -2,6 +2,7 @@
 
 namespace App\Exceptions;
 
+use App\Enums\LogEvents;
 use App\Facades\SetLog;
 use Illuminate\Database\Eloquent\Model;
 
@@ -26,12 +27,12 @@ class FailedToSavedException extends \Exception
             $this->statusCode
         );
 
-        SetLog::withEvent("Saving")
+        SetLog::withEvent(LogEvents::STORING)
             ->causedBy($causer)
             ->performedOn($performedOnModel)
             ->withMessage("Failed to save to: " . $performedOnModel)
             ->withProperties([
-                'time' => now()
+                'exception' => static::class
             ])
             ->build();
     }

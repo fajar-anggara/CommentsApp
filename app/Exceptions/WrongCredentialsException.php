@@ -2,6 +2,7 @@
 
 namespace App\Exceptions;
 
+use App\Enums\LogEvents;
 use App\Facades\SetLog;
 
 class WrongCredentialsException extends ReportableException
@@ -23,7 +24,7 @@ class WrongCredentialsException extends ReportableException
             $this->statusCode
         );
 
-        SetLog::withEvent("Login")
+        SetLog::withEvent(LogEvents::LOGIN)
             ->withMessage("Login failed for email: $email")
             ->withProperties([
                 'email' => $email,

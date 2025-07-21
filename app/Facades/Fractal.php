@@ -2,11 +2,13 @@
 
 namespace App\Facades;
 
+//use Illuminate\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Facade;
+use Illuminate\Contracts\Auth\Authenticatable;
 
 /**
- * @method static useCommenterTransformer(Model $commenter, string $token): FractalHelper
+ * @method static useCommenterTransformer(Authenticatable $commenter, string $token = null): FractalHelper
  * @method static withIncludes(array $includes): FractalHelper
  * @method static buildWithArraySerializer(): void
  */

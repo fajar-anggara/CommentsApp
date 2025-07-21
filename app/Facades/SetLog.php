@@ -2,11 +2,12 @@
 
 namespace App\Facades;
 
+use App\Enums\LogEvents;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Facade;
 
 /**
- * @method static withEvent(string $event): LogHelper
+ * @method static withEvent(LogEvents $event): LogHelper
  * @method static withProperties(array $properties): LogHelper
  * @method static withMessage(string $message): LogHelper
  * @method static withCausedBy(Model $model): LogHelper

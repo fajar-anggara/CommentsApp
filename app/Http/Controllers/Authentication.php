@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\LogEvents;
 use App\Exceptions\WrongCredentialsException;
 use App\Facades\AuthDo;
 use App\Facades\Fractal;
@@ -19,12 +20,8 @@ class Authentication
 
     public function register(CommenterRegisterRequest $request): JsonResponse
     {
-        SetLog::withEvent('Register')
-            ->causedBy(Arr::only($request->validated(), ['email']))
-            ->withProperties([
-                'name' => $request->get('name'),
-                'time' => now()
-            ])
+        SetLog::withEvent(LogEvents::REGISTER)
+            ->causedBy(Arr::only($request->validated(), ['email', 'name']))
             ->withMessage('Prepare to register a new commenter')
             ->build();
 
@@ -36,11 +33,8 @@ class Authentication
             ->withIncludes(['details'])
             ->buildWithArraySerializer();
 
-        SetLog::withEvent('Register')
+        SetLog::withEvent(LogEvents::REGISTER)
             ->causedBy(Arr::only($validated, ['name', 'email']))
-            ->withProperties([
-                'time' => now()
-            ])
             ->performedOn(User::class)
             ->withMessage('Commenter registered successfully')
             ->build();
@@ -57,11 +51,8 @@ class Authentication
      */
     public function login(CommenterLoginRequest $request): JsonResponse
     {
-        SetLog::withEvent('Login')
+        SetLog::withEvent(LogEvents::LOGIN)
             ->causedBy(Arr::only($request->validated(), ['email']))
-            ->withProperties([
-                'time' => now()
-            ])
             ->withMessage('Prepare to login a commenter')
             ->build();
 
@@ -69,7 +60,7 @@ class Authentication
         $commenter = AuthDo::findCommenterByEmail($validated['email']);
 
         if (!$commenter || !Hash::check($validated['password'], $commenter->password)) {
-            SetLog::withEvent('Login Commenter')
+            SetLog::withEvent(LogEvents::LOGIN)
                 ->withProperties(['email' => $validated["email"]])
                 ->withMessage('Commenter login failed: wrong email or password')
                 ->build();
@@ -82,11 +73,8 @@ class Authentication
         $data = Fractal::useCommenterTransformer($commenter, $token)
             ->buildWithArraySerializer();
 
-        SetLog::withEvent('Login')
+        SetLog::withEvent(LogEvents::LOGIN)
             ->causedBy(Arr::only($validated, ['name', 'email']))
-            ->withProperties([
-                'time' => now()
-            ])
             ->performedOn(User::class)
             ->withMessage('Commenter login successfully')
             ->build();
@@ -100,21 +88,15 @@ class Authentication
 
     public function logout(Request $request): JsonResponse
     {
-        SetLog::withEvent('Logout')
+        SetLog::withEvent(LogEvents::LOGOUT)
             ->causedBy(['name' => $request->user()])
-            ->withProperties([
-                'time' => now()
-            ])
             ->withMessage('Prepare Logout Commenter')
             ->build();
 
         $request->user()->currentAccessToken()->delete();
 
-        SetLog::withEvent('Logout')
+        SetLog::withEvent(LogEvents::LOGOUT)
             ->causedBy(['name' => $request->user()])
-            ->withProperties([
-                'time' => now()
-            ])
             ->withMessage('Commenter logout successfully')
             ->build();
 
@@ -126,22 +108,16 @@ class Authentication
 
     public function refresh(Request $request): JsonResponse
     {
-        SetLog::withEvent('Refresh Token')
+        SetLog::withEvent(LogEvents::REFRESH_TOKEN)
             ->causedBy(['name' => $request->user()])
-            ->withProperties([
-                'refresh_at' => now()
-            ])
             ->withMessage('Prepare refresh token')
             ->build();
 
         $request->user()->tokens()->delete();
         $token = $request->user()->createToken('refresh_token')->plainTextToken;
 
-        SetLog::withEvent('Refresh Token')
+        SetLog::withEvent(LogEvents::REFRESH_TOKEN)
             ->causedBy(['name' => $request->user()])
-            ->withProperties([
-                'refresh_at' => now()
-            ])
             ->withMessage('Refresh token successfully')
             ->build();
 

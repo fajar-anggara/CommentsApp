@@ -56,6 +56,6 @@ class UserTransformer extends TransformerAbstract
 
     public function includeStatistics(User $user): Item
     {
-        return $this->item($user->statistics(), new StatisticTransformer());
+        return $this->item($user->statistics()->first(), new StatisticTransformer());
     }
 }
