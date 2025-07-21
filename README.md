@@ -11,7 +11,8 @@ Ini merupakan apikasi REST API untuk memanage komentar seperti discuss. yang nan
 
 ### Sudah terbangun
 
-- User Register
+- User Register, Login, Logout, get my data
+- Refresh API Token
 
 ### Sedang dikerjakan
 
@@ -20,7 +21,7 @@ Ini merupakan apikasi REST API untuk memanage komentar seperti discuss. yang nan
 ## Current Status
 
 Yang sudah terimplementasi dan di test mengguakan insomnia:
-- User Register
+- User update frofile
 
 
 ## API Documentation
@@ -41,6 +42,7 @@ None
 - **Spatie Query-builder** - Simplify Query
 - **League Fractal** - Reaponse and Request converter and serializer
 - **Spatie Activity Log** - Logging
+- **Sentry** - Exception watcher
 
 
 ## Getting Started
