@@ -120,20 +120,25 @@ class AuthenticationImpl implements AuthenticationRepository
 
     public function updateCommenter(User $commenter, array $updateData): User
     {
-        if ($updateData['name'] != null)
+        if (isset($updateData['name'])) {
             $commenter->name = $updateData['name'];
+        }
 
-        if ($updateData['email'] != null)
+        if (isset($updateData['email'])) {
             $commenter->email = $updateData['email'];
+        }
 
-        if ($updateData['email_verified_at'] != null)
+        if (isset($updateData['email_verified_at'])) {
             $commenter->email_verified_at = $updateData['email_verified_at'];
+        }
 
-        if ($updateData['avatar_url'] != null)
+        if (isset($updateData['avatar_url'])) {
             $commenter->avatar_url = $updateData['avatar_url'];
+        }
 
-        if ($updateData['bio'] != null)
+        if (isset($updateData['bio'])) {
             $commenter->bio = $updateData['bio'];
+        }
 
         $savedUser = $commenter->save();
         if (!$savedUser) {
@@ -167,7 +172,9 @@ class AuthenticationImpl implements AuthenticationRepository
 
     public function deleteCommenter(User $user): bool
     {
-        return false;
+        $user->statistics()->delete();
+
+        return $user->delete();
     }
 
     public function findCommenterById(string $id): ?User
