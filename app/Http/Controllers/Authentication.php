@@ -3,18 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Enums\LogEvents;
-use App\Exceptions\WrongCredentialsException;
+use App\Exceptions\CommenterExceptions\WrongCredentialsException;
 use App\Facades\AuthDo;
 use App\Facades\Fractal;
 use App\Facades\SetLog;
 use App\Http\Requests\CommenterLoginRequest;
 use App\Http\Requests\CommenterRegisterRequest;
-use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Hash;
-use OpenApi\Annotations as OA;
 
 class Authentication
 {

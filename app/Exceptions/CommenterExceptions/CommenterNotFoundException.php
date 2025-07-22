@@ -1,13 +1,11 @@
 <?php
 
-namespace App\Exceptions;
+namespace App\Exceptions\CommenterExceptions;
 use App\Enums\LogEvents;
+use App\Exceptions\ReportableException;
 use App\Facades\SetLog;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\Request;
-use Sentry\Laravel\Facade as Sentry;
 
-class NotFoundException extends \Exception
+class CommenterNotFoundException extends ReportableException
 {
     protected string $jsonMessage;
     protected array $data;
@@ -15,7 +13,7 @@ class NotFoundException extends \Exception
     protected int $statusCode = 404;
 
     public function __construct(
-        string $jsonMessage = "Data tidak ditemukan",
+        string $jsonMessage = "User tidak ditemukan",
         array $data = [],
         string $model = '',
         int $statusCode = 404

@@ -17,4 +17,7 @@ enum LogEvents: string
     case UPDATE = "Update";
     case DELETE = "Delete";
     case REFRESH_TOKEN = "Refresh Token";
+
+    // Comments
+    case CREATE_COMMENTS = "Create Comments";
 }

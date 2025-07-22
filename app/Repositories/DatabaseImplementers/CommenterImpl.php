@@ -4,19 +4,18 @@ namespace App\Repositories\DatabaseImplementers;
 
 use App\Enums\Badges;
 use App\Enums\LogEvents;
-use App\Exceptions\NotFoundException;
+use App\Exceptions\BadgeExceptions\BadgeNotFoundException;
+use App\Exceptions\CommenterExceptions\CommenterNotFoundException;
 use App\Exceptions\FailedToSavedException;
 use App\Facades\SetLog;
 use App\Models\Badge;
 use App\Models\StatisticUser;
 use App\Models\User;
-use App\Repositories\Interfaces\AuthenticationRepository;
-use Illuminate\Contracts\Auth\Authenticatable;
-use Illuminate\Support\Arr;
-use Ramsey\Uuid\Uuid;
+use App\Repositories\Interfaces\CommenterRepository;
 use Illuminate\Support\Facades\Hash;
+use Ramsey\Uuid\Uuid;
 
-class AuthenticationImpl implements AuthenticationRepository
+class CommenterImpl implements CommenterRepository
 {
 
     /**
@@ -30,25 +29,21 @@ class AuthenticationImpl implements AuthenticationRepository
                 ->withProperties([
                     'causer' => ['badge_id' => Badges::SIDER->value],
                     'performedOn' => [
-                        'class' => AuthenticationImpl::class,
+                        'class' => CommenterImpl::class,
                         'method' => 'addNewCommenter'
                     ]
                 ])
                 ->withMessage('Failed to fetch badge')
                 ->build();
 
-            throw new NotFoundException(
-                "Kesalahan, silahkan coba lagi",
-                ['badge_id' => Badges::SIDER->value],
-                Badge::class
-            );
+            throw new BadgeNotFoundException();
         }
         SetLog::withEvent(LogEvents::FETCHING)
             ->causedBy($badge)
             ->performedOn($badge)
             ->withProperties([
                 'performedOn' => [
-                    'class' => AuthenticationImpl::class,
+                    'class' => CommenterImpl::class,
                     'method' => 'addNewCommenter'
                 ]
             ])
@@ -67,7 +62,7 @@ class AuthenticationImpl implements AuthenticationRepository
                 ->withProperties([
                     'causer' => $commenter,
                     'performedOn' => [
-                        'class' => AuthenticationImpl::class,
+                        'class' => CommenterImpl::class,
                         'method' => 'addNewCommenter'
                     ]
                 ])
@@ -90,7 +85,7 @@ class AuthenticationImpl implements AuthenticationRepository
                 ->withProperties([
                     'causer' => ['user_id' => $savedUser->id],
                     'performedOn' => [
-                        'class' => AuthenticationImpl::class,
+                        'class' => CommenterImpl::class,
                         'method' => 'addNewCommenter'
                     ]
                 ])
@@ -100,7 +95,7 @@ class AuthenticationImpl implements AuthenticationRepository
             throw new FailedToSavedException(
                 "Kesalahan, silahkan coba lagi",
                 $commenter,
-                User::class
+                StatisticUser::class
             );
         }
         SetLog::withEvent(LogEvents::STORING)
@@ -108,7 +103,7 @@ class AuthenticationImpl implements AuthenticationRepository
             ->performedOn($savedStatistic)
             ->withProperties([
                 'performedOn' => [
-                    'class' => AuthenticationImpl::class,
+                    'class' => CommenterImpl::class,
                     'method' => 'addNewCommenter'
                 ]
             ])
@@ -149,7 +144,7 @@ class AuthenticationImpl implements AuthenticationRepository
                         'email' => $commenter->email
                     ],
                     'performedOn' => [
-                        'class' => AuthenticationImpl::class,
+                        'class' => CommenterImpl::class,
                         'method' => 'updateCommenter'
                     ]
                 ])
@@ -181,20 +176,20 @@ class AuthenticationImpl implements AuthenticationRepository
     {
         $commenter = User::find($id);
         if (!$commenter) {
-            SetLog::withEvent(LogEvents::FETCHING_COMMENTER)
+            SetLog::withEvent(LogEvents::FETCHING)
                 ->withProperties([
                     'performedOn' => [
-                        'class' => AuthenticationImpl::class,
+                        'class' => CommenterImpl::class,
                         'method' => 'findCommenterById'
                     ]
                 ])
                 ->withMessage('Commenter not found')
                 ->build();
 
-            throw new NotFoundException(
-                "Kesalahan, silahkan coba lagi",
+            throw new CommenterNotFoundException(
+                "User tidak ditemukan, silahkan coba lagi",
                 ['id' => $id],
-                AuthenticationImpl::class
+                CommenterImpl::class
             );
         }
 
@@ -202,25 +197,25 @@ class AuthenticationImpl implements AuthenticationRepository
     }
 
     /**
-     * @throws NotFoundException
+     * @throws CommenterNotFoundException
      */
     public function findCommenterByEmail(string $email): ?User
     {
         $fetched = User::where('email', $email)->first();
         if (!$fetched) {
-            SetLog::withEvent(LogEvents::FETCHING_COMMENTER)
+            SetLog::withEvent(LogEvents::FETCHING)
                 ->withProperties([
                     "email" => $email,
                     "time" => now(),
                     'performedOn' => [
-                        'class' => AuthenticationImpl::class,
+                        'class' => CommenterImpl::class,
                         'method' => 'findCommenterByEmail'
                     ]
                 ])
                 ->withMessage('Commenter not found')
                 ->build();
 
-            throw new NotFoundException(
+            throw new CommenterNotFoundException(
                 "Email atau Nama tidak ditemukan",
                 ['email' => $email],
                 User::class

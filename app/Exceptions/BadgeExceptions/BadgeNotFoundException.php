@@ -1,23 +1,24 @@
 <?php
 
-namespace App\Exceptions;
+namespace App\Exceptions\BadgeExceptions;
 
 use App\Enums\LogEvents;
+use App\Exceptions\ReportableException;
 use App\Facades\SetLog;
-use Illuminate\Database\Eloquent\Model;
+use App\Models\Badge;
 
-class FailedToSavedException extends ReportableException
+class BadgeNotFoundException extends ReportableException
 {
     protected string $jsonMessage;
     protected array $data;
     protected string $model;
-    protected int $statusCode = 500;
+    protected int $statusCode = 404;
 
     public function __construct(
-        string $jsonMessage = "Kesalahan, silahkan coba lagi",
+        string $jsonMessage = "Badge tidak ditemukan",
         array $data = [],
-        string $model = '',
-        int $statusCode = 500
+        string $model = Badge::class,
+        int $statusCode = 404
     )
     {
         $this->jsonMessage = $jsonMessage;
@@ -30,7 +31,7 @@ class FailedToSavedException extends ReportableException
             $this->statusCode
         );
 
-        SetLog::withEvent(LogEvents::STORING)
+        SetLog::withEvent(LogEvents::FETCHING)
             ->withProperties([
                 'data' => $data,
                 'model' => $model,
@@ -40,7 +41,7 @@ class FailedToSavedException extends ReportableException
                     'method' => '__construct'
                 ]
             ])
-            ->withMessage("Failed to save data: $jsonMessage")
+            ->withMessage("Data not found: $jsonMessage")
             ->build();
     }
 }

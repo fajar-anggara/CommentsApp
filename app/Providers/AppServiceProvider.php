@@ -4,7 +4,10 @@ namespace App\Providers;
 
 use App\Helpers\ExactImplementers\FractalHelperImpl;
 use App\Helpers\ExactImplementers\LogHelperImpl;
-use App\Repositories\DatabaseImplementers\AuthenticationImpl;
+use App\Repositories\DatabaseImplementers\ArticleImpl;
+use App\Repositories\DatabaseImplementers\CommenterImpl;
+use App\Repositories\DatabaseImplementers\CommentImpl;
+use App\Repositories\DatabaseImplementers\TenantImpl;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -14,7 +17,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-//        $this->app->bind(AuthenticationRepository::class, AuthenticationImpl::class);
+//        $this->app->bind(CommenterRepository::class, CommenterImpl::class);
 //        $this->app->bind(LogHelper::class, LogHelperImpl::class);
 //        $this->app->bind(FractalHelper::class, FractalHelperImpl::class);
 
@@ -25,7 +28,16 @@ class AppServiceProvider extends ServiceProvider
             return new LogHelperImpl();
         });
         $this->app->bind('AuthDo', function ($app) {
-           return new AuthenticationImpl();
+           return new CommenterImpl();
+        });
+        $this->app->bind('Tenant', function ($app) {
+            return new TenantImpl();
+        });
+        $this->app->bind('Article', function ($app) {
+            return new ArticleImpl();
+        });
+        $this->app->bind('CommentDo', function ($app) {
+            return new CommentImpl();
         });
     }
 

@@ -5,7 +5,7 @@ namespace App\Repositories\Interfaces;
 use App\Models\User;
 use Illuminate\Contracts\Auth\Authenticatable;
 
-interface AuthenticationRepository
+interface CommenterRepository
 {
     public function addNewCommenter(array $commenter): User;
     public function updateCommenter(User $commenter, array $updateData): User;

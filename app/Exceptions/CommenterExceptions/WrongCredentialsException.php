@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Exceptions;
+namespace App\Exceptions\CommenterExceptions;
 
 use App\Enums\LogEvents;
+use App\Exceptions\ReportableException;
 use App\Facades\SetLog;
 
 class WrongCredentialsException extends ReportableException

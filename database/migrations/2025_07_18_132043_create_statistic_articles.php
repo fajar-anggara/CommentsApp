@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('statistic_articles', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('article_id');
+            $table->foreign('article_id')->references('id')->on('articles')->onDelete('cascade');
             $table->integer('total_active_comments')->default(0);
             $table->integer('total_reported_comments')->default(0);
             $table->integer('total_upVote_comments')->default(0);

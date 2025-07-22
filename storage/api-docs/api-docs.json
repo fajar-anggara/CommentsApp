@@ -12,6 +12,95 @@
         }
     ],
     "paths": {
+        "/api/articles/{externalId}/comments": {
+            "post": {
+                "tags": [
+                    "Articles"
+                ],
+                "summary": "Add a new comment to an article",
+                "description": "Add a new comment to an article",
+                "operationId": "bc5611562a6e76be98c0a11a6293f722",
+                "parameters": [
+                    {
+                        "name": "externalId",
+                        "in": "path",
+                        "description": "The external ID of the article",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "user_id",
+                                    "content",
+                                    "tenant_id",
+                                    "article_id",
+                                    "article_url"
+                                ],
+                                "properties": {
+                                    "user_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "content": {
+                                        "type": "string",
+                                        "example": "This is a great article!"
+                                    },
+                                    "parent_id": {
+                                        "type": "integer",
+                                        "example": null
+                                    },
+                                    "tenant_id": {
+                                        "type": "string",
+                                        "example": "some-tenant-id"
+                                    },
+                                    "article_id": {
+                                        "type": "string",
+                                        "example": "ext-123"
+                                    },
+                                    "article_url": {
+                                        "type": "string",
+                                        "example": "http://example.com/article/123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Comment added successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Berhasil comment"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
         "/api/auth/register": {
             "post": {
                 "tags": [
@@ -678,6 +767,10 @@
         }
     },
     "tags": [
+        {
+            "name": "Articles",
+            "description": "Articles"
+        },
         {
             "name": "Authentication",
             "description": "Authentication"

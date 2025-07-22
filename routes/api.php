@@ -32,27 +32,30 @@ Route::prefix('/auth')->group(function () {
 
 // Public/Semi-public
 Route::middleware(['permission:reporting|read comments'])->group(function () {
-    Route::get('/articles/{articleId}', [Article::class, 'getInfo'])->name('article.getInfo');
-    Route::get('/articles/{externalId}/comments', [Article::class, 'getComments'])->name('article.getComments');
+    Route::get('/articles/{articleId}', [Article::class, 'getInfo'])->name('gsad.getInfo');
+    Route::get('/articles/{externalId}/comments', [Article::class, 'getComments'])->name('gsad.getComments');
 
     Route::get('/comments/{commentId}/replies', [Comment::class, 'getReplies'])->name('comment.getReplies');
+
+    Route::get('/users/{userId}/comments', [Comment::class, 'getCommenterDetails'])->name('comment.getCommenterDetails');
+
+
+//    Route::get('/comments/{commentId}/thread', [Comment::class, 'getThread'])->name('comment.getThread');
+//    Route::get('/comments/{commentId}/context', [Comment::class, 'getContext'])->name('comment.getContext');
+});
+
+// Comment creation
+Route::middleware(['auth:sanctum', 'permission:create comments|delete comments|update comments'])->group(function () {
     Route::post('/comments/{commentId}/like', [Comment::class, 'addLike'])->name('comment.addLike');
     Route::delete('/comments/{commentId}/like', [Comment::class, 'deleteLike'])->name('comment.deleteLike');
     Route::post('/comments/{commentId}/report', [Comment::class, 'addReport'])->name('comment.addReport');
     Route::delete('/comments/{commentId}/report', [Comment::class, 'deleteReport'])->name('comment.deleteReport');
-    Route::get('/users/{userId}/comments', [Comment::class, 'getCommenterDetails'])->name('comment.getCommenterDetails');
 
     Route::post('/comments/{commentId}/upvote', [Comment::class, 'upvote'])->name('comment.upvote');
     Route::post('/comments/{commentId}/downVote', [Comment::class, 'downVote'])->name('comment.downVote');
     Route::delete('/comments/{commentId}/vote', [Comment::class, 'removeVote'])->name('comment.removeVote');
 
-    Route::get('/comments/{commentId}/thread', [Comment::class, 'getThread'])->name('comment.getThread');
-    Route::get('/comments/{commentId}/context', [Comment::class, 'getContext'])->name('comment.getContext');
-});
-
-// Comment creation
-Route::middleware(['auth:sanctum', 'permission:create comments'])->group(function () {
-    Route::post('/articles/{externalId}/comments', [Article::class, 'addComment'])->name('article.addComment');
+    Route::post('/articles/{externalId}/comments', [Article::class, 'addComment'])->name('gsad.addComment');
     Route::post('/comments/{commentId}/replies', [Comment::class, 'addReply'])->name('comment.addReply');
 });
 
