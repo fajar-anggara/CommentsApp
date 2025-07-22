@@ -8,6 +8,7 @@ use Sentry\Laravel\Facade;
 
 /**
  * @method static addNewComment(array $comment, string $articleId, Authenticatable $commenter)
+ * @method static findCommentByExternalArticleIdAndTenantId(string $externalArticleId, int $tenantId, string $parentId = null)
  */
 class CommentDo extends Facade
 {

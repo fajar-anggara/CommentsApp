@@ -12,6 +12,7 @@ use App\Http\Controllers\Recruiting;
 use App\Http\Controllers\Analytics;
 
 // Authentication endpoints
+Route::get('/articles/{tenantId}/{externalId}/comments', [Article::class, 'getComments'])->name('article.getComments');
 Route::prefix('/auth')->group(function () {
     Route::post('/register', [Authentication::class, 'register'])->name('register');
     Route::post('/login', [Authentication::class, 'login'])->name('login');
@@ -32,8 +33,7 @@ Route::prefix('/auth')->group(function () {
 
 // Public/Semi-public
 Route::middleware(['permission:reporting|read comments'])->group(function () {
-    Route::get('/articles/{articleId}', [Article::class, 'getInfo'])->name('gsad.getInfo');
-    Route::get('/articles/{externalId}/comments', [Article::class, 'getComments'])->name('gsad.getComments');
+    Route::get('/articles/{articleId}', [Article::class, 'getInfo'])->name('article.getInfo');
 
     Route::get('/comments/{commentId}/replies', [Comment::class, 'getReplies'])->name('comment.getReplies');
 
@@ -55,7 +55,7 @@ Route::middleware(['auth:sanctum', 'permission:create comments|delete comments|u
     Route::post('/comments/{commentId}/downVote', [Comment::class, 'downVote'])->name('comment.downVote');
     Route::delete('/comments/{commentId}/vote', [Comment::class, 'removeVote'])->name('comment.removeVote');
 
-    Route::post('/articles/{externalId}/comments', [Article::class, 'addComment'])->name('gsad.addComment');
+    Route::post('/articles/comments', [Article::class, 'addComment'])->name('article.addComment');
     Route::post('/comments/{commentId}/replies', [Comment::class, 'addReply'])->name('comment.addReply');
 });
 

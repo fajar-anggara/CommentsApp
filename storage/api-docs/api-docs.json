@@ -12,10 +12,128 @@
         }
     ],
     "paths": {
+        "/api/articles/{tenantId}/{externalId}/comments": {
+            "get": {
+                "tags": [
+                    "Article"
+                ],
+                "summary": "Get all comments in the article based on external_article_id",
+                "description": "Get the comments",
+                "operationId": "88b91a19d34572ca3e6b8901ba163fae",
+                "parameters": [
+                    {
+                        "name": "tenantId",
+                        "in": "path",
+                        "description": "Tenant id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "externalId",
+                        "in": "path",
+                        "description": "The external id of the article",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success to fetch comments",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Berhasil memuat komentar"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string",
+                                                        "example": "0198326e-df9d-71ea-b271-fac6c3052657"
+                                                    },
+                                                    "article_id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "tenant_id": {
+                                                        "type": "string",
+                                                        "example": "1"
+                                                    },
+                                                    "user_id": {
+                                                        "type": "string",
+                                                        "example": "01982faf-bf2e-7050-8c0a-cdef6db19460"
+                                                    },
+                                                    "content": {
+                                                        "type": "string",
+                                                        "example": "This is a great comment!"
+                                                    },
+                                                    "parent_id": {
+                                                        "type": "string",
+                                                        "example": null,
+                                                        "nullable": true
+                                                    },
+                                                    "status": {
+                                                        "type": "string",
+                                                        "example": "approved"
+                                                    },
+                                                    "likes_count": {
+                                                        "type": "integer",
+                                                        "example": 0
+                                                    },
+                                                    "reports_count": {
+                                                        "type": "integer",
+                                                        "example": 0
+                                                    },
+                                                    "upvotes_count": {
+                                                        "type": "integer",
+                                                        "example": 0
+                                                    },
+                                                    "downvotes_count": {
+                                                        "type": "integer",
+                                                        "example": 0
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2025-07-22T21:17:27+07:00"
+                                                    },
+                                                    "updated_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2025-07-22T21:17:27+07:00"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
         "/api/articles/{externalId}/comments": {
             "post": {
                 "tags": [
-                    "Articles"
+                    "Article"
                 ],
                 "summary": "Add a new comment to an article",
                 "description": "Add a new comment to an article",
@@ -768,8 +886,8 @@
     },
     "tags": [
         {
-            "name": "Articles",
-            "description": "Articles"
+            "name": "Article",
+            "description": "Article"
         },
         {
             "name": "Authentication",

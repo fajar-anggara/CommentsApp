@@ -8,11 +8,12 @@ use League\Fractal\TransformerAbstract;
 
 class CommentTransformer extends TransformerAbstract
 {
-    public function transform(Comment $comment): array
+    public function transform(Comment|\stdClass $comment): array
     {
         return [
             'id'            => (string) $comment->id,
             'article_id'    => (int) $comment->article_id,
+            'tenant_id'       => (string) $comment->tenant_id,
             'user_id'       => (string) $comment->user_id,
             'content'       => (string) $comment->content,
             'parent_id'     => (string) $comment->parent_id,
@@ -21,8 +22,8 @@ class CommentTransformer extends TransformerAbstract
             'reports_count' => (int) $comment->reports_count,
             'upvotes_count' => (int) $comment->upvotes_count,
             'downvotes_count' => (int) $comment->downvotes_count,
-            'created_at'    => (string) $comment->created_at->toIso8601String(),
-            'updated_at'    => (string) $comment->updated_at->toIso8601String(),
+            'created_at'    => (string) $comment->created_at,
+            'updated_at'    => (string) $comment->updated_at,
         ];
     }
 }

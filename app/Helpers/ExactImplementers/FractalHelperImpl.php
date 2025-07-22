@@ -3,8 +3,10 @@
 namespace App\Helpers\ExactImplementers;
 
 use App\Helpers\Interfaces\FractalHelper;
+use App\Transformers\CommentTransformer;
 use App\Transformers\UserTransformer;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Support\Collection;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
 use League\Fractal\Serializer\ArraySerializer;
@@ -18,7 +20,7 @@ class FractalHelperImpl implements FractalHelper
      */
     protected Manager $manager;
     protected array $includes = [];
-    protected Item $resource;
+    protected Item|\League\Fractal\Resource\Collection $resource;
 
     public function useCommenterTransformer(Authenticatable $commenter, string $token = null): FractalHelper
     {
@@ -27,6 +29,14 @@ class FractalHelperImpl implements FractalHelper
             $transformer->setToken($token);
         }
         $this->resource = new Item($commenter, $transformer);
+
+        return $this;
+    }
+
+    public function useCommentTransformer(Collection $comments): FractalHelper
+    {
+        $transformer = new CommentTransformer();
+        $this->resource = new \League\Fractal\Resource\Collection($comments, $transformer);
 
         return $this;
     }

@@ -9,6 +9,8 @@ use App\Facades\SetLog;
 use App\Models\Comment;
 use App\Repositories\Interfaces\CommentRepository;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Ramsey\Uuid\Uuid;
 
 class CommentImpl implements CommentRepository
@@ -20,6 +22,7 @@ class CommentImpl implements CommentRepository
         $comment = Comment::create([
             'id' => $uuid,
             'article_id' => $articleId,
+            'tenant_id' => "1",
             'user_id' => $commenter->id,
             'content' => $comment['content'],
             'parent_id' => $comment['parent_id'],
@@ -50,4 +53,26 @@ class CommentImpl implements CommentRepository
 
         return $comment;
     }
+
+    public function findCommentByExternalArticleIdAndTenantId(string $externalArticleId, int $tenantId, string $parentId = null): ?Collection
+    {
+        $comments = DB::table('comments')
+            ->where('article_id', $externalArticleId)
+            ->where('tenant_id', $tenantId)
+            ->where('parent_id', $parentId)
+            ->get();
+
+        if ($comments->isEmpty()) {
+            SetLog::withEvent(LogEvents::FETCHING)
+                ->causedBy($comments)
+                ->performedOn($comments)
+                ->withMessage("No comments yet")
+                ->build();
+
+            return $comments;
+        }
+
+        return $comments;
+    }
+
 }
