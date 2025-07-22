@@ -13,8 +13,8 @@ class LogHelperImpl implements LogHelperInterface
     protected ?string $event = LogEvents::DEFAULT->value;
     protected array $properties = [];
     protected ?string $message = null;
-    protected ?array $causedBy = null;
-    protected string $performedOn = '';
+    protected ?Model $causedBy = null;
+    protected ?Model $performedOn = null;
 
     public function withEvent(LogEvents $event): LogHelperInterface
     {
@@ -34,13 +34,13 @@ class LogHelperImpl implements LogHelperInterface
         return $this;
     }
 
-    public function causedBy(array $causer): LogHelperInterface
+    public function causedBy(Model $causer): LogHelperInterface
     {
         $this->causedBy = $causer;
         return $this;
     }
 
-    public function performedOn(string $model): LogHelperInterface
+    public function performedOn(Model $model): LogHelperInterface
     {
         $this->performedOn = $model;
         return $this;
@@ -50,7 +50,7 @@ class LogHelperImpl implements LogHelperInterface
     {
         $activity = activity();
         if ($this->performedOn instanceof Model && $this->performedOn->exists) {
-            $activity->perFormedOn($this->performedOn);
+            $activity->performedOn($this->performedOn);
         }
         if ($this->causedBy instanceof Model && $this->causedBy->exists) {
             $activity->causedBy($this->causedBy);

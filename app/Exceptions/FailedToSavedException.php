@@ -9,32 +9,38 @@ use Illuminate\Database\Eloquent\Model;
 class FailedToSavedException extends \Exception
 {
     protected string $jsonMessage;
-    protected array $causer;
-    protected string $performedModel;
+    protected array $data;
+    protected string $model;
     protected int $statusCode = 500;
 
     public function __construct(
-        string $jsonMessage = "Terjadi kesalahan, harap coba lagi",
-        array $causer  = [],
-        string $performedOnModel = null,
-    ) {
+        string $jsonMessage = "Kesalahan, silahkan coba lagi",
+        array $data = [],
+        string $model = '',
+        int $statusCode = 500
+    )
+    {
         $this->jsonMessage = $jsonMessage;
-        $this->causer = $causer;
-        $this->performedModel = $performedOnModel;
+        $this->data = $data;
+        $this->model = $model;
+        $this->statusCode = $statusCode;
 
-        Parent::__construct(
+        parent::__construct(
             $this->jsonMessage,
             $this->statusCode
         );
 
         SetLog::withEvent(LogEvents::STORING)
-            ->causedBy($causer)
-            ->performedOn($performedOnModel)
-            ->withMessage("Failed to save to: " . $performedOnModel)
             ->withProperties([
-                'exception' => static::class
+                'data' => $data,
+                'model' => $model,
+                'exception' => static::class,
+                'performedOn' => [
+                    'class' => static::class,
+                    'method' => '__construct'
+                ]
             ])
+            ->withMessage("Failed to save data: $jsonMessage")
             ->build();
     }
 }
-

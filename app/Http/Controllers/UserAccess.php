@@ -23,25 +23,18 @@ class UserAccess
      *
      * @return \Illuminate\Http\JsonResponse
      * @throws \Illuminate\Auth\AuthenticationException
-     *
-     * @response {
-     *   "success": true,
-     *   "message": "Berhasil memuat data",
-     *   "data": {
-     *     "id": 1,
-     *     "name": "John Doe",
-     *     "email": "john@example.com",
-     *     "details": {},
-     *     "statistics": {},
-     *     "comments": []
-     *   }
-     * }
      */
     public function me(): JsonResponse
     {
         SetLog::withEvent(LogEvents::FETCHING_COMMENTER)
-            ->causedBy(Arr::only((array)auth()->guard()->user(), ['name', 'email']))
-            ->performedOn(UserAccess::class)
+            ->causedBy(auth()->guard()->user())
+            ->performedOn(auth()->guard()->user())
+            ->withProperties([
+                'performedOn' => [
+                    'class' => UserAccess::class,
+                    'method' => 'me'
+                ]
+            ])
             ->withMessage("Fetching commenter from guard - sanctum")
             ->build();
 
@@ -66,24 +59,19 @@ class UserAccess
      * @param CommenterUpdateRequest $request The incoming request containing profile data
      * @return \Illuminate\Http\JsonResponse
      * @throws \Illuminate\Auth\AuthenticationException
-     *
-     * @response {
-     *   "success": true,
-     *   "message": "Berhasil update data",
-     *   "data": {
-     *     "id": 1,
-     *     "name": "Updated Name",
-     *     "email": "updated@example.com",
-     *     "details": {}
-     *   }
-     * }
      */
     public function profile(CommenterUpdateRequest $request): JsonResponse
     {
         $validated = $request->validated();
         SetLog::withEvent(LogEvents::STORING)
-            ->causedBy(Arr::only((array)auth()->guard()->user(), ['name', 'email']))
-            ->performedOn(UserAccess::class)
+            ->causedBy(auth()->guard()->user())
+            ->performedOn(auth()->guard()->user())
+            ->withProperties([
+                'performedOn' => [
+                    'class' => UserAccess::class,
+                    'method' => 'profile'
+                ]
+            ])
             ->withMessage("Prepare to update profile commenter")
             ->build();
 
@@ -97,9 +85,15 @@ class UserAccess
             ->buildWithArraySerializer();
 
         SetLog::withEvent(LogEvents::UPDATE)
-            ->causedBy(Arr::only((array)$commenter, ['name', 'email']))
-            ->performedOn(UserAccess::class)
-            ->withMessage("Update data profile commenter success")
+            ->causedBy($commenter)
+            ->performedOn($commenter)
+            ->withProperties([
+                'performedOn' => [
+                    'class' => UserAccess::class,
+                    'method' => 'profile'
+                ]
+            ])
+            ->withMessage("Profile commenter updated successfully")
             ->build();
 
         return response()->json([
@@ -114,11 +108,6 @@ class UserAccess
      *
      * @return \Illuminate\Http\JsonResponse
      * @throws \Illuminate\Auth\AuthenticationException
-     *
-     * @response {
-     *   "success": true,
-     *   "message": "Account deleted successfully"
-     * }
      */
     public function deleteAccount()
     {

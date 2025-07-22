@@ -29,6 +29,10 @@ class WrongCredentialsException extends ReportableException
             ->withProperties([
                 'email' => $email,
                 'exception' => static::class,
+                'performedOn' => [
+                    'class' => static::class,
+                    'method' => '__construct'
+                ]
             ])
             ->build();
     }

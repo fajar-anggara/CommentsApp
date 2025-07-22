@@ -14,6 +14,7 @@ use App\Repositories\Interfaces\AuthenticationRepository;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Arr;
 use Ramsey\Uuid\Uuid;
+use Illuminate\Support\Facades\Hash;
 
 class AuthenticationImpl implements AuthenticationRepository
 {
@@ -26,26 +27,51 @@ class AuthenticationImpl implements AuthenticationRepository
         $badge = Badge::where('name', Badges::SIDER->value)->first();
         if (!$badge) {
             SetLog::withEvent(LogEvents::FETCHING)
-                ->causedBy(['badge_id' => Badges::SIDER->value])
-                ->performedOn(AuthenticationImpl::class)
+                ->withProperties([
+                    'causer' => ['badge_id' => Badges::SIDER->value],
+                    'performedOn' => [
+                        'class' => AuthenticationImpl::class,
+                        'method' => 'addNewCommenter'
+                    ]
+                ])
                 ->withMessage('Failed to fetch badge')
                 ->build();
 
             throw new NotFoundException(
                 "Kesalahan, silahkan coba lagi",
-                ['badge_id' => $badge->id],
+                ['badge_id' => Badges::SIDER->value],
                 Badge::class
             );
         }
+        SetLog::withEvent(LogEvents::FETCHING)
+            ->causedBy($badge)
+            ->performedOn($badge)
+            ->withProperties([
+                'performedOn' => [
+                    'class' => AuthenticationImpl::class,
+                    'method' => 'addNewCommenter'
+                ]
+            ])
+            ->withMessage('Fetched badge')
+            ->build();
 
-        $commenter['id'] = Uuid::uuid4()->toString();
-        $commenter['badge_id'] = $badge->id;
-        $savedUser = User::create($commenter);
+        $savedUser = User::create([
+            'id' => Uuid::uuid4()->toString(),
+            'name' => $commenter['name'],
+            'email' => $commenter['email'],
+            'password' => Hash::make($commenter['password']),
+            'badge_id' => $badge->id,
+        ]);
         if (!$savedUser) {
             SetLog::withEvent(LogEvents::STORING)
-                ->causedBy(Arr::only($commenter, ['name', 'email']))
-                ->performedOn(AuthenticationImpl::class)
-                ->withMessage('Failed to create new commenter')
+                ->withProperties([
+                    'causer' => $commenter,
+                    'performedOn' => [
+                        'class' => AuthenticationImpl::class,
+                        'method' => 'addNewCommenter'
+                    ]
+                ])
+                ->withMessage('Failed to create commenter')
                 ->build();
 
             throw new FailedToSavedException(
@@ -61,8 +87,13 @@ class AuthenticationImpl implements AuthenticationRepository
         ]);
         if (!$savedStatistic) {
             SetLog::withEvent(LogEvents::STORING)
-                ->causedBy(['user_id' => $savedUser->id])
-                ->performedOn(AuthenticationImpl::class)
+                ->withProperties([
+                    'causer' => ['user_id' => $savedUser->id],
+                    'performedOn' => [
+                        'class' => AuthenticationImpl::class,
+                        'method' => 'addNewCommenter'
+                    ]
+                ])
                 ->withMessage('Failed to create statistic for commenter')
                 ->build();
 
@@ -72,6 +103,17 @@ class AuthenticationImpl implements AuthenticationRepository
                 User::class
             );
         }
+        SetLog::withEvent(LogEvents::STORING)
+            ->causedBy($savedStatistic)
+            ->performedOn($savedStatistic)
+            ->withProperties([
+                'performedOn' => [
+                    'class' => AuthenticationImpl::class,
+                    'method' => 'addNewCommenter'
+                ]
+            ])
+            ->withMessage('Created statistic for commenter')
+            ->build();
 
         return $savedUser;
     }
@@ -96,11 +138,16 @@ class AuthenticationImpl implements AuthenticationRepository
         $savedUser = $commenter->save();
         if (!$savedUser) {
             SetLog::withEvent(LogEvents::UPDATE)
-                ->causedBy([
-                    'name' => $commenter->name,
-                    'email' => $commenter->email
+                ->withProperties([
+                    'causer' => [
+                        'name' => $commenter->name,
+                        'email' => $commenter->email
+                    ],
+                    'performedOn' => [
+                        'class' => AuthenticationImpl::class,
+                        'method' => 'updateCommenter'
+                    ]
                 ])
-                ->performedOn(AuthenticationImpl::class)
                 ->withMessage('Failed to update commenter')
                 ->build();
 
@@ -128,7 +175,12 @@ class AuthenticationImpl implements AuthenticationRepository
         $commenter = User::find($id);
         if (!$commenter) {
             SetLog::withEvent(LogEvents::FETCHING_COMMENTER)
-                ->performedOn(AuthenticationImpl::class)
+                ->withProperties([
+                    'performedOn' => [
+                        'class' => AuthenticationImpl::class,
+                        'method' => 'findCommenterById'
+                    ]
+                ])
                 ->withMessage('Commenter not found')
                 ->build();
 
@@ -152,7 +204,11 @@ class AuthenticationImpl implements AuthenticationRepository
             SetLog::withEvent(LogEvents::FETCHING_COMMENTER)
                 ->withProperties([
                     "email" => $email,
-                    "time" => now()
+                    "time" => now(),
+                    'performedOn' => [
+                        'class' => AuthenticationImpl::class,
+                        'method' => 'findCommenterByEmail'
+                    ]
                 ])
                 ->withMessage('Commenter not found')
                 ->build();

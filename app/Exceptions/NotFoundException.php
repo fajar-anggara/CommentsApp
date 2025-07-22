@@ -10,31 +10,38 @@ use Sentry\Laravel\Facade as Sentry;
 class NotFoundException extends \Exception
 {
     protected string $jsonMessage;
-    protected array $causer;
-    protected string $performedModel;
+    protected array $data;
+    protected string $model;
     protected int $statusCode = 404;
 
     public function __construct(
         string $jsonMessage = "Data tidak ditemukan",
-        array $causer  = [],
-        string $performedOnModel = null,
-    ) {
+        array $data = [],
+        string $model = '',
+        int $statusCode = 404
+    )
+    {
         $this->jsonMessage = $jsonMessage;
-        $this->causer = $causer;
-        $this->performedModel = $performedOnModel;
+        $this->data = $data;
+        $this->model = $model;
+        $this->statusCode = $statusCode;
 
-        Parent::__construct(
+        parent::__construct(
             $this->jsonMessage,
             $this->statusCode
         );
 
         SetLog::withEvent(LogEvents::FETCHING)
-            ->causedBy($causer)
-            ->performedOn($performedOnModel)
-            ->withMessage("Not Found when access: " . $performedOnModel)
             ->withProperties([
-                'exception' => static::class
+                'data' => $data,
+                'model' => $model,
+                'exception' => static::class,
+                'performedOn' => [
+                    'class' => static::class,
+                    'method' => '__construct'
+                ]
             ])
+            ->withMessage("Data not found: $jsonMessage")
             ->build();
     }
 }

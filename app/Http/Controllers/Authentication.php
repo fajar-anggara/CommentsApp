@@ -21,8 +21,13 @@ class Authentication
     public function register(CommenterRegisterRequest $request): JsonResponse
     {
         SetLog::withEvent(LogEvents::REGISTER)
-            ->causedBy(Arr::only($request->validated(), ['email', 'name']))
-            ->performedOn(Authentication::class)
+            ->withProperties([
+                'causer' => Arr::only($request->validated(), ['name', 'email']),
+                'performedOn' => [
+                    'class' => Authentication::class,
+                    'method' => 'register'
+                ]
+            ])
             ->withMessage('Prepare to register a new commenter')
             ->build();
 
@@ -35,8 +40,14 @@ class Authentication
             ->buildWithArraySerializer();
 
         SetLog::withEvent(LogEvents::REGISTER)
-            ->causedBy(Arr::only($validated, ['name', 'email']))
-            ->performedOn(Authentication::class)
+            ->causedBy($commenter)
+            ->performedOn($commenter)
+            ->withProperties([
+                'performedOn' => [
+                    'class' => Authentication::class,
+                    'method' => 'register'
+                ]
+            ])
             ->withMessage('Commenter registered successfully')
             ->build();
 
@@ -53,8 +64,13 @@ class Authentication
     public function login(CommenterLoginRequest $request): JsonResponse
     {
         SetLog::withEvent(LogEvents::LOGIN)
-            ->causedBy(Arr::only($request->validated(), ['email']))
-            ->performedOn(Authentication::class)
+            ->withProperties([
+                'causer' => Arr::only($request->validated(), ['email']),
+                'performedOn' => [
+                    'class' => Authentication::class,
+                    'method' => 'login'
+                ]
+            ])
             ->withMessage('Prepare to login a commenter')
             ->build();
 
@@ -63,8 +79,13 @@ class Authentication
 
         if (!$commenter || !Hash::check($validated['password'], $commenter->password)) {
             SetLog::withEvent(LogEvents::LOGIN)
-                ->withProperties(['email' => $validated["email"]])
-                ->performedOn(Authentication::class)
+                ->withProperties([
+                    'email' => $validated["email"],
+                    'performedOn' => [
+                        'class' => Authentication::class,
+                        'method' => 'login'
+                    ]
+                ])
                 ->withMessage('Commenter login failed: wrong email or password')
                 ->build();
 
@@ -77,8 +98,14 @@ class Authentication
             ->buildWithArraySerializer();
 
         SetLog::withEvent(LogEvents::LOGIN)
-            ->causedBy(Arr::only($validated, ['name', 'email']))
-            ->performedOn(Authentication::class)
+            ->causedBy($commenter)
+            ->performedOn($commenter)
+            ->withProperties([
+                'performedOn' => [
+                    'class' => Authentication::class,
+                    'method' => 'login'
+                ]
+            ])
             ->withMessage('Commenter login successfully')
             ->build();
 
@@ -92,16 +119,27 @@ class Authentication
     public function logout(Request $request): JsonResponse
     {
         SetLog::withEvent(LogEvents::LOGOUT)
-            ->causedBy(['name' => $request->user()])
-            ->performedOn(Authentication::class)
+            ->withProperties([
+                'causer' => ['name' => $request->user()->name],
+                'performedOn' => [
+                    'class' => Authentication::class,
+                    'method' => 'logout'
+                ]
+            ])
             ->withMessage('Prepare Logout Commenter')
             ->build();
 
         $request->user()->currentAccessToken()->delete();
 
         SetLog::withEvent(LogEvents::LOGOUT)
-            ->causedBy(['name' => $request->user()])
-            ->performedOn(Authentication::class)
+            ->causedBy($request->user())
+            ->performedOn($request->user())
+            ->withProperties([
+                'performedOn' => [
+                    'class' => Authentication::class,
+                    'method' => 'logout'
+                ]
+            ])
             ->withMessage('Commenter logout successfully')
             ->build();
 
@@ -114,8 +152,13 @@ class Authentication
     public function refresh(Request $request): JsonResponse
     {
         SetLog::withEvent(LogEvents::REFRESH_TOKEN)
-            ->causedBy(['name' => $request->user()])
-            ->performedOn(Authentication::class)
+            ->withProperties([
+                'causer' => ['name' => $request->user()->name],
+                'performedOn' => [
+                    'class' => Authentication::class,
+                    'method' => 'refresh'
+                ]
+            ])
             ->withMessage('Prepare refresh token')
             ->build();
 
@@ -123,8 +166,14 @@ class Authentication
         $token = $request->user()->createToken('refresh_token')->plainTextToken;
 
         SetLog::withEvent(LogEvents::REFRESH_TOKEN)
-            ->causedBy(['name' => $request->user()])
-            ->performedOn(Authentication::class)
+            ->causedBy($request->user())
+            ->performedOn($request->user())
+            ->withProperties([
+                'performedOn' => [
+                    'class' => Authentication::class,
+                    'method' => 'refresh'
+                ]
+            ])
             ->withMessage('Refresh token successfully')
             ->build();
 
