@@ -1,0 +1,191 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "CommentsApp API",
+    "description": "API specification for the CommentsApp project. This file only contains endpoints that are already fully implemented. Additional endpoints can be appended under the `paths` object or by creating new spec files in the same directory (e.g., `v2.json`).",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "{baseUrl}/api",
+      "description": "API server",
+      "variables": {
+        "baseUrl": {
+          "default": "http://localhost:8000",
+          "description": "Base URL of the Laravel application"
+        }
+      }
+    }
+  ],
+  "tags": [
+    { "name": "Authentication", "description": "User authentication and profile management" },
+    { "name": "Articles", "description": "Article information and comment retrieval" },
+    { "name": "Comments", "description": "Comment related endpoints" }
+  ],
+  "paths": {
+    "/auth/register": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Register a new commenter account",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "email": { "type": "string", "format": "email" },
+                  "password": { "type": "string", "format": "password" }
+                },
+                "required": ["name", "email", "password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User registered successfully"
+          },
+          "422": { "description": "Validation error" }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Authenticate user and retrieve token",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string", "format": "email" },
+                  "password": { "type": "string", "format": "password" }
+                },
+                "required": ["email", "password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Successful login returns auth token" },
+          "401": { "description": "Invalid credentials" }
+        }
+      }
+    },
+    "/auth/logout": {
+      "get": {
+        "tags": ["Authentication"],
+        "summary": "Invalidate current user token",
+        "security": [{ "sanctumAuth": [] }],
+        "responses": { "200": { "description": "Logged out" } }
+      }
+    },
+    "/auth/refresh": {
+      "get": {
+        "tags": ["Authentication"],
+        "summary": "Refresh authentication token",
+        "security": [{ "sanctumAuth": [] }],
+        "responses": { "200": { "description": "Token refreshed" } }
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "tags": ["Authentication"],
+        "summary": "Get current authenticated user profile",
+        "security": [{ "sanctumAuth": [] }],
+        "responses": { "200": { "description": "User details" } }
+      }
+    },
+    "/auth/profile": {
+      "put": {
+        "tags": ["Authentication"],
+        "summary": "Update authenticated user profile",
+        "security": [{ "sanctumAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "bio": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Profile updated" } }
+      }
+    },
+    "/auth/account": {
+      "delete": {
+        "tags": ["Authentication"],
+        "summary": "Delete authenticated user account",
+        "security": [{ "sanctumAuth": [] }],
+        "responses": { "200": { "description": "Account deleted" } }
+      }
+    },
+
+    "/articles/{articleId}": {
+      "get": {
+        "tags": ["Articles"],
+        "summary": "Get article information",
+        "parameters": [
+          {
+            "name": "articleId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": { "200": { "description": "Article info" }, "404": { "description": "Not found" } }
+      }
+    },
+
+    "/articles/{externalId}/comments": {
+      "get": {
+        "tags": ["Articles"],
+        "summary": "Get comments for an article by external ID",
+        "parameters": [
+          {
+            "name": "externalId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": { "200": { "description": "Comments list" } }
+      }
+    },
+
+    "/comments/{commentId}/replies": {
+      "get": {
+        "tags": ["Comments"],
+        "summary": "Get replies to a comment",
+        "parameters": [
+          {
+            "name": "commentId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": { "200": { "description": "Replies list" }, "404": { "description": "Not found" } }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "sanctumAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "Token"
+      }
+    }
+  }
+}

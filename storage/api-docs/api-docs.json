@@ -1,0 +1,690 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "CommentsApp API Documentation",
+        "description": "Automatically generated documentation for the finished CommentApp endpoints",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "/",
+            "description": "Current host"
+        }
+    ],
+    "paths": {
+        "/api/auth/register": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Register a new commenter",
+                "description": "Register a new commenter",
+                "operationId": "9d3e34181adc8e4bca06be6a8deaf127",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "John Doe"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "john@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "secret123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Successful registration",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Berhasil register Commenter"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string",
+                                                    "format": "uuid",
+                                                    "example": "01982faf-bf2e-7050-8c0a-cdef6db19460"
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "andriana"
+                                                },
+                                                "avatar_url": {
+                                                    "type": "string",
+                                                    "example": ""
+                                                },
+                                                "token": {
+                                                    "type": "string",
+                                                    "example": "3|LUx4smphAFtNOP5c47cdB6gBdOMpaCEw7YQwEog152cc13de"
+                                                },
+                                                "details": {
+                                                    "properties": {
+                                                        "email": {
+                                                            "type": "string",
+                                                            "format": "email",
+                                                            "example": "andriana@gmail.com"
+                                                        },
+                                                        "email_verified_at": {
+                                                            "type": "string",
+                                                            "example": null,
+                                                            "nullable": true
+                                                        },
+                                                        "bio": {
+                                                            "type": "string",
+                                                            "example": ""
+                                                        },
+                                                        "total_comments_created": {
+                                                            "type": "integer",
+                                                            "example": 0
+                                                        },
+                                                        "total_likes_acquired": {
+                                                            "type": "integer",
+                                                            "example": 0
+                                                        },
+                                                        "is_muted": {
+                                                            "type": "boolean",
+                                                            "example": false
+                                                        },
+                                                        "is_banned": {
+                                                            "type": "boolean",
+                                                            "example": false
+                                                        },
+                                                        "created_at": {
+                                                            "type": "string",
+                                                            "format": "date-time",
+                                                            "example": "2025-07-22T01:11:43+00:00"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Kesalahan. Silakan coba lagi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Kesalahan. Silakan coba lagi"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/auth/login": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Login commenter",
+                "description": "Login commenter and retrieve bearer token",
+                "operationId": "7c1efa90260016fbe3833d64bcf813a6",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "john@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "secret123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful login",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Berhasil login"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string",
+                                                    "format": "uuid",
+                                                    "example": "01982faf-bf2e-7050-8c0a-cdef6db19460"
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "andriana"
+                                                },
+                                                "avatar_url": {
+                                                    "type": "string",
+                                                    "example": ""
+                                                },
+                                                "token": {
+                                                    "type": "string",
+                                                    "example": "4|LUx4smphAFtNOP5c47cdB6gBdOMpaCEw7YQwEog152cc13de"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid credentials",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Email atau password salah"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/auth/logout": {
+            "get": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Logout commenter",
+                "description": "Logout authenticated commenter",
+                "operationId": "05646c55399571de89883217e49f88a8",
+                "responses": {
+                    "200": {
+                        "description": "Successful logout",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Berhasil logout"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "0": {
+                            "sanctum": []
+                        }
+                    }
+                ]
+            }
+        },
+        "/api/auth/refresh": {
+            "get": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Refresh token",
+                "description": "Refresh bearer token for authenticated commenter",
+                "operationId": "f405589a759ecf18ef7cf9c5b083b1d9",
+                "responses": {
+                    "200": {
+                        "description": "Token refreshed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Berhasil refresh token"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "token": {
+                                                    "type": "string",
+                                                    "example": "5|someNewRefreshedToken"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "0": {
+                            "sanctum": []
+                        }
+                    }
+                ]
+            }
+        },
+        "/api/auth/me": {
+            "get": {
+                "tags": [
+                    "UserAccess"
+                ],
+                "summary": "Get commenter profile",
+                "description": "Get authenticated commenter profile",
+                "operationId": "102ade7f7af066cc43060e9438261f4a",
+                "responses": {
+                    "200": {
+                        "description": "Successful fetch commenter data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Berhasil memuat data"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string",
+                                                    "format": "uuid",
+                                                    "example": "01982faf-bf2e-7050-8c0a-cdef6db19460"
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "andriana"
+                                                },
+                                                "avatar_url": {
+                                                    "type": "string",
+                                                    "example": ""
+                                                },
+                                                "details": {
+                                                    "properties": {
+                                                        "email": {
+                                                            "type": "string",
+                                                            "format": "email",
+                                                            "example": "andriana@gmail.com"
+                                                        },
+                                                        "email_verified_at": {
+                                                            "type": "string",
+                                                            "example": null,
+                                                            "nullable": true
+                                                        },
+                                                        "bio": {
+                                                            "type": "string",
+                                                            "example": ""
+                                                        },
+                                                        "total_comments_created": {
+                                                            "type": "integer",
+                                                            "example": 0
+                                                        },
+                                                        "total_likes_acquired": {
+                                                            "type": "integer",
+                                                            "example": 0
+                                                        },
+                                                        "is_muted": {
+                                                            "type": "boolean",
+                                                            "example": false
+                                                        },
+                                                        "is_banned": {
+                                                            "type": "boolean",
+                                                            "example": false
+                                                        },
+                                                        "created_at": {
+                                                            "type": "string",
+                                                            "format": "date-time",
+                                                            "example": "2025-07-22T01:11:43+00:00"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "0": {
+                            "sanctum": []
+                        }
+                    }
+                ]
+            }
+        },
+        "/api/auth/profile": {
+            "put": {
+                "tags": [
+                    "UserAccess"
+                ],
+                "summary": "Update commenter profile",
+                "description": "Update authenticated commenter profile",
+                "operationId": "a35fd1dfd5f797d0983ed80e29493114",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "John Doe"
+                                    },
+                                    "bio": {
+                                        "type": "string",
+                                        "example": "A short bio"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful update",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Berhasil update data"
+                                        },
+                                        "data": {
+                                            "type": "boolean",
+                                            "example": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to update profile",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Gagal menyimpan data, silahkan coba kembali"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "0": {
+                            "sanctum": []
+                        }
+                    }
+                ]
+            }
+        },
+        "/api/auth/account": {
+            "delete": {
+                "tags": [
+                    "UserAccess"
+                ],
+                "summary": "Delete commenter account",
+                "description": "Delete authenticated commenter account",
+                "operationId": "99911c10fe865ccd779ce03921db36d2",
+                "responses": {
+                    "200": {
+                        "description": "Successful deletion",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Berhasil menghapus akun"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to delete account",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Gagal menghapus akun, silahkan coba kembali"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "0": {
+                            "sanctum": []
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "sanctum": {
+                "type": "apiKey",
+                "description": "Enter token in format (Bearer <token>)",
+                "name": "Authorization",
+                "in": "header"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Authentication",
+            "description": "Authentication"
+        },
+        {
+            "name": "UserAccess",
+            "description": "UserAccess"
+        }
+    ]
+}
