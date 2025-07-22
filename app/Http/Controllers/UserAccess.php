@@ -63,7 +63,7 @@ class UserAccess
     public function profile(CommenterUpdateRequest $request): JsonResponse
     {
         $validated = $request->validated();
-        SetLog::withEvent(LogEvents::STORING)
+        SetLog::withEvent(LogEvents::UPDATE)
             ->causedBy(auth()->guard()->user())
             ->performedOn(auth()->guard()->user())
             ->withProperties([
@@ -111,6 +111,36 @@ class UserAccess
      */
     public function deleteAccount()
     {
+        SetLog::withEvent(DoEvents::DELETE)
+            ->causedBy(auth()->guard()->user())
+            ->performedOn(auth()->guard()->user())
+            ->withProperties([
+                'performedOn' => [
+                    'class' => UserAccess::class,
+                    'method' => 'deleteAccount'
+                ]
+            ])
+            ->withMessage("Prepare to delete account commenter")
+            ->build();
 
+        $commenter = AuthDo::findCommenterById(auth()->guard()->user()->id);
+        AuthDo::deleteCommenter($commenter);
+
+        SetLog::withEvent(LogEvents::DELETE)
+            ->causedBy($commenter)
+            ->performedOn($commenter)
+            ->withProperties([
+                'performedOn' => [
+                    'class' => UserAccess::class,
+                    'method' => 'deleteAccount'
+                ]
+            ])
+            ->withMessage("Account commenter deleted successfully")
+            ->build();
+
+        return response()->json([
+            'success' => true,
+            'message' => "Berhasil menghapus akun"
+        ]);
     }
 }
