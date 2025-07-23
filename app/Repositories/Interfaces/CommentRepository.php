@@ -11,4 +11,6 @@ interface CommentRepository
     public function addNewComment(array $comment, string $articleId, Authenticatable $commenter): ?Comment;
     public function findCommentByExternalArticleIdAndTenantId(string $externalArticleId, int $tenantId): ?Collection;
     public function findRepliesByCommentId(string $commentId): ?Collection;
+    public function findCommentById(string $commentId): ?Comment;
+    public function addLikeByCommenter(string $commentId, Authenticatable $commenter): bool;
 }

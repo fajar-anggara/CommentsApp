@@ -4,10 +4,13 @@ namespace App\Providers;
 
 use App\Helpers\ExactImplementers\FractalHelperImpl;
 use App\Helpers\ExactImplementers\LogHelperImpl;
+use App\Models\Comment;
+use App\Policies\CommentPolicy;
 use App\Repositories\DatabaseImplementers\ArticleImpl;
 use App\Repositories\DatabaseImplementers\CommenterImpl;
 use App\Repositories\DatabaseImplementers\CommentImpl;
 use App\Repositories\DatabaseImplementers\TenantImpl;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -46,6 +49,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Gate::policy(Comment::class, CommentPolicy::class);
     }
 }
+

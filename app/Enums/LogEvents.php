@@ -21,4 +21,5 @@ enum LogEvents: string
     // Comments
     case CREATE_COMMENTS = "Create Comments";
     case FETCHING_COMMENTS = "Fetching Comments";
+    case STORING_COMMENTS = "Storing Comments";
 }

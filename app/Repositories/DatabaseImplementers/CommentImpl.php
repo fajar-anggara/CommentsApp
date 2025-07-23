@@ -10,6 +10,7 @@ use App\Exceptions\FailedToSavedException;
 use App\Facades\SetLog;
 use App\Jobs\StatisticUserJob;
 use App\Models\Comment;
+use App\Models\CommentLike;
 use App\Repositories\Interfaces\CommentRepository;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Collection;
@@ -83,6 +84,60 @@ class CommentImpl implements CommentRepository
         }
 
         return $replies;
+    }
+
+    public function findCommentById(string $commentId): ?Comment
+    {
+        $comment = Comment::find($commentId);
+
+        if (!$comment) {
+            throw new CommentNotFoundException(
+                "Komentar tidak ditemukan",
+                [
+                    'comment_id' => $commentId,
+                    'model' => Comment::class
+                ]
+            );
+        }
+
+        return $comment;
+    }
+
+    public function addLikeByCommenter(string $commentId, Authenticatable $commenter): bool
+    {
+        DB::transaction(function () use ($commentId, $commenter) {
+            $comment = Comment::find($commentId);
+            if (!$comment) {
+                throw new CommentNotFoundException(
+                    "Komentar tidak ditemukan",
+                    [
+                        'comment_id' => $commentId,
+                        'model' => Comment::class
+                    ]
+                );
+            }
+            $comment->likes_count = $comment->likes_count + 1;
+            $comment->save();
+
+            $useLiked = CommentLike::updateOrCreate([
+                'comment_id' => $commentId,
+                'user_id' => $commenter->id
+            ]);
+            if (!$useLiked) {
+                throw new FailedToSavedException(
+                    "Gagal menyimpan like. Harap coba lagi",
+                    [
+                        'user' => $commenter,
+                        'comment' => $comment,
+                        'model' => CommentLike::class
+                    ]
+                );
+            }
+        });
+
+        StatisticUserJob::dispatch($commenter->id, StatisticUserJobType::INCREMENT_LIKES_GIVEN);
+
+        return true;
     }
 
 }

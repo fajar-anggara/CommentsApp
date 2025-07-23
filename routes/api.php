@@ -42,6 +42,11 @@ Route::middleware(['permission:reporting|read comments'])->group(function () {
 //    Route::get('/comments/{commentId}/context', [Comment::class, 'getContext'])->name('comment.getContext');
 });
 
+Route::middleware(['auth:sanctum', 'permission:create comments|delete comments|update comments'])->group(function () {
+    Route::post('/comments/{commentId}/like', [Comment::class, 'addLike'])->name('comment.addLike');
+    // ... other routes
+});
+
 // Comment creation
 Route::middleware(['auth:sanctum', 'permission:create comments|delete comments|update comments'])->group(function () {
     Route::post('/comments/{commentId}/like', [Comment::class, 'addLike'])->name('comment.addLike');

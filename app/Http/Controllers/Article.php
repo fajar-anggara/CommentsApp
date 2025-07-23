@@ -35,7 +35,7 @@ class Article
      *         description="Tenant id"
      *     ),
      *     @OA\Parameter (
-     *          name="externalId",
+     *          name="articleId",
      *          in="path",
      *          required=true,
      *          @OA\Schema(type="string"),
@@ -119,16 +119,9 @@ class Article
      * Add a new comment to an article
      *
      * @OA\Post(
-     *     path="/api/articles/{externalId}/comments",
+     *     path="/api/articles/comments",
      *     summary="Add a new comment to an article",
      *     tags={"Article"},
-     *     @OA\Parameter(
-     *         name="externalId",
-     *         in="path",
-     *         required=true,
-     *         @OA\Schema(type="string"),
-     *         description="The external ID of the article"
-     *     ),
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
