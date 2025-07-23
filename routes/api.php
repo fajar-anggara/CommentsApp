@@ -11,8 +11,13 @@ use App\Http\Controllers\Badge;
 use App\Http\Controllers\Recruiting;
 use App\Http\Controllers\Analytics;
 
-// Authentication endpoints
+// public
 Route::get('/articles/{tenantId}/{externalId}/comments', [Article::class, 'getComments'])->name('article.getComments');
+Route::get('/articles/{articleId}', [Article::class, 'getInfo'])->name('article.getInfo');
+Route::get('/comments/{commentId}/replies', [Comment::class, 'getReplies'])->name('comment.getReplies');
+Route::get('/users/{userId}/comments', [Comment::class, 'getCommenterDetails'])->name('comment.getCommenterDetails');
+
+// Authentication endpoints
 Route::prefix('/auth')->group(function () {
     Route::post('/register', [Authentication::class, 'register'])->name('register');
     Route::post('/login', [Authentication::class, 'login'])->name('login');
@@ -33,13 +38,6 @@ Route::prefix('/auth')->group(function () {
 
 // Public/Semi-public
 Route::middleware(['permission:reporting|read comments'])->group(function () {
-    Route::get('/articles/{articleId}', [Article::class, 'getInfo'])->name('article.getInfo');
-
-    Route::get('/comments/{commentId}/replies', [Comment::class, 'getReplies'])->name('comment.getReplies');
-
-    Route::get('/users/{userId}/comments', [Comment::class, 'getCommenterDetails'])->name('comment.getCommenterDetails');
-
-
 //    Route::get('/comments/{commentId}/thread', [Comment::class, 'getThread'])->name('comment.getThread');
 //    Route::get('/comments/{commentId}/context', [Comment::class, 'getContext'])->name('comment.getContext');
 });

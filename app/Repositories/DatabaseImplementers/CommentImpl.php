@@ -4,8 +4,10 @@ namespace App\Repositories\DatabaseImplementers;
 
 use App\Enums\CommentStatus;
 use App\Enums\LogEvents;
+use App\Enums\StatisticUserJobType;
 use App\Exceptions\FailedToSavedException;
 use App\Facades\SetLog;
+use App\Jobs\StatisticUserJob;
 use App\Models\Comment;
 use App\Repositories\Interfaces\CommentRepository;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -50,6 +52,8 @@ class CommentImpl implements CommentRepository
                 Comment::class
             );
         }
+
+        StatisticUserJob::dispatch($commenter->id, StatisticUserJobType::INCREMENT_COMMENTS_CREATED);
 
         return $comment;
     }

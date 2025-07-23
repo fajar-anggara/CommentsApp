@@ -4,10 +4,12 @@ namespace App\Repositories\DatabaseImplementers;
 
 use App\Enums\Badges;
 use App\Enums\LogEvents;
+use App\Enums\StatisticUserJobType;
 use App\Exceptions\BadgeExceptions\BadgeNotFoundException;
 use App\Exceptions\CommenterExceptions\CommenterNotFoundException;
 use App\Exceptions\FailedToSavedException;
 use App\Facades\SetLog;
+use App\Jobs\StatisticUserJob;
 use App\Models\Badge;
 use App\Models\StatisticUser;
 use App\Models\User;
@@ -77,39 +79,7 @@ class CommenterImpl implements CommenterRepository
         }
 
         $savedUser->assignRole('commenter');
-        $savedStatistic = StatisticUser::create([
-            'user_id' => $savedUser->id,
-        ]);
-        if (!$savedStatistic) {
-            SetLog::withEvent(LogEvents::STORING)
-                ->withProperties([
-                    'causer' => ['user_id' => $savedUser->id],
-                    'performedOn' => [
-                        'class' => CommenterImpl::class,
-                        'method' => 'addNewCommenter'
-                    ]
-                ])
-                ->withMessage('Failed to create statistic for commenter')
-                ->build();
-
-            throw new FailedToSavedException(
-                "Kesalahan, silahkan coba lagi",
-                $commenter,
-                StatisticUser::class
-            );
-        }
-        SetLog::withEvent(LogEvents::STORING)
-            ->causedBy($savedStatistic)
-            ->performedOn($savedStatistic)
-            ->withProperties([
-                'performedOn' => [
-                    'class' => CommenterImpl::class,
-                    'method' => 'addNewCommenter'
-                ]
-            ])
-            ->withMessage('Created statistic for commenter')
-            ->build();
-
+        StatisticUserJob::dispatch($savedUser->id, StatisticUserJobType::INITIALIZE_USER_STATISTICS);
         return $savedUser;
     }
 
@@ -206,7 +176,6 @@ class CommenterImpl implements CommenterRepository
             SetLog::withEvent(LogEvents::FETCHING)
                 ->withProperties([
                     "email" => $email,
-                    "time" => now(),
                     'performedOn' => [
                         'class' => CommenterImpl::class,
                         'method' => 'findCommenterByEmail'
@@ -227,6 +196,6 @@ class CommenterImpl implements CommenterRepository
 
     public function existsCommenterById(int $id): bool
     {
-        return false;
+        return (bool) User::find($id);
     }
 }

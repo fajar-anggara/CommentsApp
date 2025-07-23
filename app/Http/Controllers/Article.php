@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Enums\LogEvents;
+use App\Enums\StatisticArticleJobType;
 use App\Facades\CommentDo;
 use App\Facades\Fractal;
 use App\Facades\SetLog;
 use App\Http\Requests\CommentsAddRequest;
+use App\Jobs\addStatisticArticle;
 use Illuminate\Http\JsonResponse;
 use App\Facades\Article as ArticleDo;
 
@@ -94,7 +96,9 @@ class Article
         $data = Fractal::useCommentTransformer($comments)
             ->buildWithArraySerializer();
 
-        SetLog::withEvent(LogEvents::FETCHING_COMMENTS)
+        SetLog::withEvent(LogEvents::FETCHING)
+            ->causedBy($data)
+            ->performedOn($data)
             ->withProperties([
                 'performedOn' => [
                     'class' => Article::class,
@@ -102,6 +106,8 @@ class Article
                 ]
             ])
             ->withMessage("Fetch comments successfully");
+
+        addStatisticArticle::dispatch($externalId, StatisticArticleJobType::INCREMENT_VIEWS);
 
         return response()->json([
             'success' => true,
@@ -169,7 +175,6 @@ class Article
             $validated['article_id'],
             $validated['tenant_id'],
         );
-//        dd($comment);
 
         $comment = CommentDo::addNewComment(
             $validated,
@@ -188,6 +193,8 @@ class Article
                 ]
             ])
             ->withMessage("Comment added successfully");
+
+        addStatisticArticle::dispatch($article->id, StatisticArticleJobType::INCREMENT_COMMENTS_COUNT);
 
         return response()->json([
             'success' => true,
