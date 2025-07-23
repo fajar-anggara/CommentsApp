@@ -9,5 +9,6 @@ use Illuminate\Support\Collection;
 interface CommentRepository
 {
     public function addNewComment(array $comment, string $articleId, Authenticatable $commenter): ?Comment;
-    public function findCommentByExternalArticleIdAndTenantId(string $externalArticleId, int $tenantId, string $parentId): ?Collection;
+    public function findCommentByExternalArticleIdAndTenantId(string $externalArticleId, int $tenantId): ?Collection;
+    public function findRepliesByCommentId(string $commentId): ?Collection;
 }

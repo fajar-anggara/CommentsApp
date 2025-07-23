@@ -14,15 +14,15 @@ class TenantImpl implements TenantRepository
 {
     public function findTenantById(int $id): ?Tenant
     {
-        $tenant = tenant::find($id);
+        $tenant = Tenant::find($id);
         if (!$tenant) {
-            SetLog::withEvent(LogEvents::FETCHING)
-                ->causedBy($tenant)
-                ->performedOn($tenant)
-                ->withMessage("Tenant not found")
-                ->build();
-
-            throw new TenantNotFoundException();
+            throw new TenantNotFoundException(
+                "Tenant tidak ditemukan",
+                [
+                    'id' => $id,
+                    'model' => Tenant::class
+                ]
+            );
         }
 
         SetLog::withEvent(LogEvents::FETCHING)

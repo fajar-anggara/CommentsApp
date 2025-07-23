@@ -27,30 +27,14 @@ class CommenterImpl implements CommenterRepository
     {
         $badge = Badge::where('name', Badges::SIDER->value)->first();
         if (!$badge) {
-            SetLog::withEvent(LogEvents::FETCHING)
-                ->withProperties([
-                    'causer' => ['badge_id' => Badges::SIDER->value],
-                    'performedOn' => [
-                        'class' => CommenterImpl::class,
-                        'method' => 'addNewCommenter'
-                    ]
-                ])
-                ->withMessage('Failed to fetch badge')
-                ->build();
-
-            throw new BadgeNotFoundException();
-        }
-        SetLog::withEvent(LogEvents::FETCHING)
-            ->causedBy($badge)
-            ->performedOn($badge)
-            ->withProperties([
-                'performedOn' => [
-                    'class' => CommenterImpl::class,
-                    'method' => 'addNewCommenter'
+            throw new BadgeNotFoundException(
+                'Badge tidak ditemukan',
+                [
+                    'badge_name' => Badges::SIDER->value,
+                    'model' => Badge::class
                 ]
-            ])
-            ->withMessage('Fetched badge')
-            ->build();
+            );
+        }
 
         $savedUser = User::create([
             'id' => Uuid::uuid4()->toString(),
@@ -60,21 +44,12 @@ class CommenterImpl implements CommenterRepository
             'badge_id' => $badge->id,
         ]);
         if (!$savedUser) {
-            SetLog::withEvent(LogEvents::STORING)
-                ->withProperties([
-                    'causer' => $commenter,
-                    'performedOn' => [
-                        'class' => CommenterImpl::class,
-                        'method' => 'addNewCommenter'
-                    ]
-                ])
-                ->withMessage('Failed to create commenter')
-                ->build();
-
             throw new FailedToSavedException(
                 "Kesalahan, silahkan coba lagi",
-                $commenter,
-                User::class
+                [
+                    'commenter' => $commenter,
+                    'model' => User::class
+                ]
             );
         }
 
@@ -107,27 +82,13 @@ class CommenterImpl implements CommenterRepository
 
         $savedUser = $commenter->save();
         if (!$savedUser) {
-            SetLog::withEvent(LogEvents::UPDATE)
-                ->withProperties([
-                    'causer' => [
-                        'name' => $commenter->name,
-                        'email' => $commenter->email
-                    ],
-                    'performedOn' => [
-                        'class' => CommenterImpl::class,
-                        'method' => 'updateCommenter'
-                    ]
-                ])
-                ->withMessage('Failed to update commenter')
-                ->build();
-
             throw new FailedToSavedException(
                 "Kesalahan, silahkan coba lagi",
                 [
                     'name' => $commenter->name,
-                    'email' => $commenter->email
-                ],
-                User::class
+                    'email' => $commenter->email,
+                    'model' => User::class
+                ]
             );
         }
 
@@ -146,20 +107,12 @@ class CommenterImpl implements CommenterRepository
     {
         $commenter = User::find($id);
         if (!$commenter) {
-            SetLog::withEvent(LogEvents::FETCHING)
-                ->withProperties([
-                    'performedOn' => [
-                        'class' => CommenterImpl::class,
-                        'method' => 'findCommenterById'
-                    ]
-                ])
-                ->withMessage('Commenter not found')
-                ->build();
-
             throw new CommenterNotFoundException(
                 "User tidak ditemukan, silahkan coba lagi",
-                ['id' => $id],
-                CommenterImpl::class
+                [
+                    'id' => $id,
+                    'model' => User::class
+                ]
             );
         }
 
@@ -173,21 +126,12 @@ class CommenterImpl implements CommenterRepository
     {
         $fetched = User::where('email', $email)->first();
         if (!$fetched) {
-            SetLog::withEvent(LogEvents::FETCHING)
-                ->withProperties([
-                    "email" => $email,
-                    'performedOn' => [
-                        'class' => CommenterImpl::class,
-                        'method' => 'findCommenterByEmail'
-                    ]
-                ])
-                ->withMessage('Commenter not found')
-                ->build();
-
             throw new CommenterNotFoundException(
                 "Email atau Nama tidak ditemukan",
-                ['email' => $email],
-                User::class
+                [
+                    'email' => $email,
+                    'model' => User::class
+                ]
             );
         }
 

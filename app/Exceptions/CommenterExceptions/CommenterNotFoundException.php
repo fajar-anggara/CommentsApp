@@ -1,45 +1,17 @@
 <?php
 
 namespace App\Exceptions\CommenterExceptions;
-use App\Enums\LogEvents;
-use App\Exceptions\ReportableException;
-use App\Facades\SetLog;
 
-class CommenterNotFoundException extends ReportableException
+use App\Exceptions\ApplicationException;
+
+class CommenterNotFoundException extends ApplicationException
 {
-    protected string $jsonMessage;
-    protected array $data;
-    protected string $model;
-    protected int $statusCode = 404;
-
     public function __construct(
-        string $jsonMessage = "User tidak ditemukan",
-        array $data = [],
-        string $model = '',
+        string $message = "User tidak ditemukan",
+        array $context = [],
         int $statusCode = 404
     )
     {
-        $this->jsonMessage = $jsonMessage;
-        $this->data = $data;
-        $this->model = $model;
-        $this->statusCode = $statusCode;
-
-        parent::__construct(
-            $this->jsonMessage,
-            $this->statusCode
-        );
-
-        SetLog::withEvent(LogEvents::FETCHING)
-            ->withProperties([
-                'data' => $data,
-                'model' => $model,
-                'exception' => static::class,
-                'performedOn' => [
-                    'class' => static::class,
-                    'method' => '__construct'
-                ]
-            ])
-            ->withMessage("Data not found: $jsonMessage")
-            ->build();
+        parent::__construct($message, $statusCode, $context);
     }
 }

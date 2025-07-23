@@ -1,71 +1,99 @@
-# Universal Comments App 
+# CommentsApp: Universal Commenting System Backend
 
-Sebuah backend app untuk aplikasi management komentar universal
+CommentsApp adalah aplikasi komentar management universal seperti discuss forum, dibangun dengan praktik pengembangan modern.
 
-## About
+Aplikasi ini adalah sarana untuk saya membangun aplikasi dengan clean code, scalable, dan monitorable.
 
-Ini merupakan apikasi REST API untuk memanage komentar seperti discuss. yang nantinya akan di embbed oleh front-end secara terpisah.
-- User Management (baru User Register)
+---
 
-## Features
+## Core Features
 
-### Sudah terbangun
-
-- CRUD user
-- Refresh API Token
-
-### Sedang dikerjakan
-
-- Add tenant
-
-## Current Status
-
-Yang sudah terimplementasi dan di test mengguakan insomnia:
-- User update frofile
-
-
-## API Documentation
-
-None
-
-## Testing
-
-None
+- **User Authentication**: Using sanctum for user authentication.
+- **Role-Based Permission Control**: Using Spatie Laravel Permission to control user permissions.
+- **Token-Based API**: Stateless API with support for token refresh.
+- **Profile Management**: CRUD user.
+- **Commenting System**: CRUD comment. likes, upvote, downvote, and report.
+- **Asynchronous Job Processing**: Using laravel horizon for offloading heavy tasks like logging and statistics to background queues.
+- **Centralized Exception Handling**: A custom, reusable exception system that standardizes error responses and logging.
+- **Detailed Activity Logging**: Using Spatie Activity Log for tracking and custom UI for track logs.
 
 ## Tech Stack
 
-- **PHP 8+** - Language
-- **Laravel Sanctum** - API and user management
-- **Spatie Laravel Permission** - Management Role
-- **Laravel Horizon** - Job Watcher
-- **Laravel Telescope** - Monitoring when development
-- **Spatie Query-builder** - Simplify Query
-- **League Fractal** - Reaponse and Request converter and serializer
-- **Spatie Activity Log** - Logging
-- **Sentry** - Exception watcher
-
+- **Backend**: PHP 8+, Laravel 12+
+- **Database**: MySQL, Redis
+- **API Authentication**: Laravel Sanctum
+- **Role Management**: Spatie Laravel Permission
+- **Queue & Job Management**: Laravel Horizon
+- **Development Monitoring**: Laravel Telescope
+- **API Response Serialization**: League/Fractal
+- **Activity Logging**: Spatie Activity Log
+- **Exception Monitoring**: Sentry
+- **Local Environment**: Docker, Laravel Sail
 
 ## Getting Started
 
 ### Prerequisites
-- PHP 8+
-- Laravel 12+
 
-### Setup local
+- [Docker](https://www.docker.com/products/docker-desktop/)
+- [WSL 2](https://docs.microsoft.com/en-us/windows/wsl/install) (for Windows users)
 
-1. Clone the repository
-   ```bash
-   git clone https://github.com/fajar-anggara/CommentsApp
-   cd CommentsApp
-   ```
+### Local Development Setup
 
-2. Run the application
-   If you using windows, use docker wsl ubuntu un order to run Laravel Sail and Horizon.
-   ```bash
-   ./Vendor/bin/sail up -d
-   ```
+1.  **Clone repository:**
+    ```bash
+    git clone https://github.com/fajar-anggara/CommentsApp.git
+    cd CommentsApp
+    ```
+
+2.  **Create environment file:**
+    ```bash
+    cp .env.example .env
+    ```
+
+3.  **Start application containers using Sail:**
+    ```bash
+    ./vendor/bin/sail up -d
+    ```
+
+4.  **Install dependencies:**
+    ```bash
+    ./vendor/bin/sail composer install
+    ```
+
+5.  **Generate application key:**
+    ```bash
+    ./vendor/bin/sail artisan key:generate
+    ```
+
+6.  **Run database migrations and seeders:**
+    ```bash
+    ./vendor/bin/sail artisan migrate --seed
+    ```
+
+### Running the Application
+
+-   The application available at `http://localhost`.
+-   Run horizon for job processing:
+-   ```bash
+    ./vendor/bin/sail artisan horizon
+    ```
+
+## Testing
+
+Run the full test suite using the following command:
+
+```bash
+./vendor/bin/sail artisan test
+```
+
+## Important Endpoints
+
+-   **API Documentation**: `http://localhost/api/documentation`
+-   **Horizon Dashboard**: `http://localhost/horizon`
+-   **Activity Logs UI**: `http://localhost/activity-logs`
+-   **Telescope Dashboard** (Local Only): `http://localhost/telescope`
 
 ## Contact
 
-- **Email**: muhamadfajaranggara@gmail.com
-- **LinkedIn**: https://www.linkedin.com/in/moh-fajar-anggara-252219180/
+-   **Email**: muhamadfajaranggara@gmail.com
+-   **LinkedIn**: https://www.linkedin.com/in/moh-fajar-anggara-252219180/

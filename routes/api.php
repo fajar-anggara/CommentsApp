@@ -12,7 +12,7 @@ use App\Http\Controllers\Recruiting;
 use App\Http\Controllers\Analytics;
 
 // public
-Route::get('/articles/{tenantId}/{externalId}/comments', [Article::class, 'getComments'])->name('article.getComments');
+Route::get('/articles/{tenantId}/{articleId}/comments', [Article::class, 'getComments'])->name('article.getComments');
 Route::get('/articles/{articleId}', [Article::class, 'getInfo'])->name('article.getInfo');
 Route::get('/comments/{commentId}/replies', [Comment::class, 'getReplies'])->name('comment.getReplies');
 Route::get('/users/{userId}/comments', [Comment::class, 'getCommenterDetails'])->name('comment.getCommenterDetails');

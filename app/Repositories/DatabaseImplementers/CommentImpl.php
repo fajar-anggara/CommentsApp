@@ -5,6 +5,7 @@ namespace App\Repositories\DatabaseImplementers;
 use App\Enums\CommentStatus;
 use App\Enums\LogEvents;
 use App\Enums\StatisticUserJobType;
+use App\Exceptions\CommentNotFoundException;
 use App\Exceptions\FailedToSavedException;
 use App\Facades\SetLog;
 use App\Jobs\StatisticUserJob;
@@ -32,24 +33,14 @@ class CommentImpl implements CommentRepository
         ]);
 
         if (!$comment) {
-            SetLog::withEvent(LogEvents::FETCHING)
-                ->causedBy($commenter)
-                ->performedOn($comment)
-                ->withProperties([
-                    'performedOn' => [
-                        'class' => CommentImpl::class,
-                        'method' => 'addNewComment',
-                    ]
-                ]);
-
             throw new FailedToSavedException(
                 "Gagal menyimpan komentar. Harap coba lagi",
                 [
                     'user' => $commenter,
                     'article_id' => $articleId,
                     'comment' => $comment,
-                ],
-                Comment::class
+                    'model' => Comment::class
+                ]
             );
         }
 
@@ -58,12 +49,11 @@ class CommentImpl implements CommentRepository
         return $comment;
     }
 
-    public function findCommentByExternalArticleIdAndTenantId(string $externalArticleId, int $tenantId, string $parentId = null): ?Collection
+    public function findCommentByExternalArticleIdAndTenantId(string $externalArticleId, int $tenantId): ?Collection
     {
         $comments = DB::table('comments')
             ->where('article_id', $externalArticleId)
             ->where('tenant_id', $tenantId)
-            ->where('parent_id', $parentId)
             ->get();
 
         if ($comments->isEmpty()) {
@@ -77,6 +67,22 @@ class CommentImpl implements CommentRepository
         }
 
         return $comments;
+    }
+
+    public function findRepliesByCommentId(string $commentId): ?Collection
+    {
+        $replies = Comment::where('parent_id', $commentId)->get();
+        if ($replies->isEmpty()) {
+            throw new CommentNotFoundException(
+                "Komentar tidak ditemukan",
+                [
+                    'comment_id' => $commentId,
+                    'model' => Comment::class
+                ]
+            );
+        }
+
+        return $replies;
     }
 
 }

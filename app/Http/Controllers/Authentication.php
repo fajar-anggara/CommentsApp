@@ -185,7 +185,10 @@ class Authentication
                 ->withMessage('Commenter login failed: wrong email or password')
                 ->build();
 
-            throw new WrongCredentialsException($validated['email']);
+            throw new WrongCredentialsException(
+                'Email atau password salah',
+                ['email' => $validated['email']]
+            );
         }
 
         $commenter->tokens()->delete();

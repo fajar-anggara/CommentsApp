@@ -24,7 +24,7 @@ class Article
      * Get the comments
      *
      * @OA\Get (
-     *     path="/api/articles/{tenantId}/{externalId}/comments",
+     *     path="/api/articles/{tenantId}/{articleId}/comments",
      *     summary="Get all comments in the article based on tenant_id external_article_id",
      *     tags={"Article"},
      *     @OA\Parameter (
@@ -76,7 +76,7 @@ class Article
      *      )
      * )
      */
-    public function getComments($tenantId, $externalId): JsonResponse
+    public function getComments($tenantId, $articleId): JsonResponse
     {
         SetLog::withEvent(LogEvents::FETCHING_COMMENTS)
             ->withProperties([
@@ -88,9 +88,8 @@ class Article
             ->withMessage("Prepare to get comments");
 
         $comments = CommentDo::findCommentByExternalArticleIdAndTenantId(
-            $externalId,
-            $tenantId,
-            "0198326e-df9d-71ea-b271-fac6c3052657"
+            $articleId,
+            $tenantId
         );
 
         $data = Fractal::useCommentTransformer($comments)
@@ -107,7 +106,7 @@ class Article
             ])
             ->withMessage("Fetch comments successfully");
 
-        addStatisticArticle::dispatch($externalId, StatisticArticleJobType::INCREMENT_VIEWS);
+        addStatisticArticle::dispatch($articleId, StatisticArticleJobType::INCREMENT_VIEWS);
 
         return response()->json([
             'success' => true,
