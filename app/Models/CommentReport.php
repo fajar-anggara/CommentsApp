@@ -13,6 +13,7 @@ class CommentReport extends Model
     protected $fillable = [
         'comment_id',
         'user_id',
+        'reason'
     ];
 
     public function comment(): BelongsTo {

@@ -13,6 +13,8 @@ use Sentry\Laravel\Facade;
  * @method static addLikeByCommenter(string $commentId, Authenticatable $commenter)
  * @method static deleteLikeByCommenter(string $commentId,Authenticatable $commenter)
  * @method static findRepliesByCommentId(string $commentId)
+ * @method static addReportByCommenter(string $commentId, Authenticatable $commenter, array $reportData)
+ * @method static deleteReportByCommenter(string $commentId,Authenticatable $commenter)
  * @method static updateComment(Comment $comment, array $updateData)
  * @method static deleteComment(Comment $comment)
  */

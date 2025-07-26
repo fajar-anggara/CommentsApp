@@ -5,6 +5,7 @@ namespace App\Repositories\Interfaces;
 use App\Models\Comment;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 
 interface CommentRepository
 {
@@ -14,4 +15,6 @@ interface CommentRepository
     public function findCommentById(string $commentId): ?Comment;
     public function addLikeByCommenter(string $commentId, Authenticatable $commenter): bool;
     public function deleteLikeByCommenter(string $commentId,Authenticatable $commenter): bool;
+    public function addReportByCommenter(string $commentId,Authenticatable $commenter,array $validated): bool;
+    public function deleteReportByCommenter(string $commentId,Authenticatable $commenter): bool;
 }

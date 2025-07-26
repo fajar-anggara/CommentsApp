@@ -11,6 +11,7 @@ use App\Facades\SetLog;
 use App\Jobs\StatisticUserJob;
 use App\Models\Comment;
 use App\Models\CommentLike;
+use App\Models\CommentReport;
 use App\Repositories\Interfaces\CommentRepository;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Collection;
@@ -160,39 +161,130 @@ class CommentImpl implements CommentRepository
             return true;
         }
 
-        $commentLike = DB::table('comment_likes')
-            ->where('comment_id', $commentId)
-            ->where('user_id', $commenter->id)
-            ->delete();
+        DB::transaction(function () use ($commentId, $commenter) {
+            $commentLike = DB::table('comment_likes')
+                ->where('comment_id', $commentId)
+                ->where('user_id', $commenter->id)
+                ->delete();
 
-        if (!$commentLike) {
-            throw new FailedToSavedException(
-                "Gagal menghapus like. Harap coba lagi",
-                [
-                    'user' => $commenter,
-                    'comment' => $commentLike,
-                    'model' => CommentLike::class
-                ]
-            );
-        }
+            if (!$commentLike) {
+                throw new FailedToSavedException(
+                    "Gagal menghapus like. Harap coba lagi",
+                    [
+                        'user' => $commenter,
+                        'comment' => $commentLike,
+                        'model' => CommentLike::class
+                    ]
+                );
+            }
 
-        $comment = Comment::find($commentId);
-        if (!$comment) {
-            throw new CommentNotFoundException(
-                "Komentar tidak ditemukan",
-                [
-                    'comment_id' => $commentId,
-                    'model' => Comment::class
-                ]
-            );
-        }
+            $comment = Comment::find($commentId);
+            if (!$comment) {
+                throw new CommentNotFoundException(
+                    "Komentar tidak ditemukan",
+                    [
+                        'comment_id' => $commentId,
+                        'model' => Comment::class
+                    ]
+                );
+            }
 
-        $comment->likes_count = $comment->likes_count - 1;
-        $comment->save();
+            $comment->likes_count = $comment->likes_count - 1;
+            $comment->save();
+        });
 
         StatisticUserJob::dispatch($commenter->id, StatisticUserJobType::DECREMENT_LIKES_GIVEN);
 
         return true;
     }
 
+
+    public function addReportByCommenter(string $commentId,Authenticatable $commenter,array $validated): bool
+    {
+        DB::transaction(function () use ($commentId, $commenter, $validated) {
+            $comment = Comment::find($commentId);
+            if (!$comment) {
+                throw new CommentNotFoundException(
+                    "Komentar tidak ditemukan",
+                    [
+                        'comment_id' => $commentId,
+                        'model' => Comment::class
+                    ]
+                );
+            }
+            $comment->reports_count = $comment->reports_count + 1;
+            $comment->save();
+
+            $isReported = CommentReport::where('comment_id', $commentId)->where('user_id', $commenter->id)->first   ();
+
+            if ($isReported) {
+                $isReported->reason = $validated['reason'];
+                $isReported->save();
+            } else {
+                $useReported = CommentReport::create([
+                    'comment_id' => $commentId,
+                    'user_id' => $commenter->id,
+                    'reason' => $validated['reason']
+                ]);
+
+                if (!$useReported) {
+                    throw new FailedToSavedException(
+                        "Gagal menyimpan laporan. Harap coba lagi",
+                        [
+                            'user' => $commenter,
+                            'comment' => $comment,
+                            'model' => CommentReport::class
+                        ]
+                    );
+                }
+            }
+        });
+
+        StatisticUserJob::dispatch($commenter->id, StatisticUserJobType::INCREMENT_REPORTS_MADE);
+
+        return true;
+    }
+
+    public function deleteReportByCommenter(string $commentId,Authenticatable $commenter): bool
+    {
+        $isReported = CommentReport::where('comment_id', $commentId)->where('user_id', $commenter->id)->first();
+        if (!$isReported) {
+            return true;
+        }
+
+        DB::transaction(function () use ($commentId, $commenter) {
+            $comment = Comment::find($commentId);
+            if (!$comment) {
+                throw new CommentNotFoundException(
+                    "Komentar tidak ditemukan",
+                    [
+                        'comment_id' => $commentId,
+                        'model' => Comment::class
+                    ]
+                );
+            }
+
+            $comment->reports_count = $comment->reports_count - 1;
+            $comment->save();
+
+            $commentReport = DB::table('comment_reports')
+                ->where('comment_id', $commentId)
+                ->where('user_id', $commenter->id)
+                ->delete();
+            if (!$commentReport) {
+                throw new FailedToSavedException(
+                    "Gagal menghapus laporan. Harap coba lagi",
+                    [
+                        'user' => $commenter,
+                        'comment' => $commentReport,
+                        'model' => CommentReport::class
+                    ]
+                );
+            }
+        });
+
+        StatisticUserJob::dispatch($commenter->id, StatisticUserJobType::DECREMENT_REPORTS_MADE);
+
+        return true;
+    }
 }

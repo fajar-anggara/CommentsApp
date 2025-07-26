@@ -48,7 +48,7 @@ Route::middleware(['auth:sanctum', 'permission:create comments|delete comments|u
 });
 
 // Comment creation
-Route::middleware(['auth:sanctum', 'permission:create comments|delete comments|update comments'])->group(function () {
+Route::middleware(['auth:sanctum', 'permission:create comments|delete comments|update comments|reporting comments'])->group(function () {
     Route::post('/comments/{commentId}/like', [Comment::class, 'addLike'])->name('comment.addLike');
     Route::delete('/comments/{commentId}/like', [Comment::class, 'deleteLike'])->name('comment.deleteLike');
     Route::post('/comments/{commentId}/report', [Comment::class, 'addReport'])->name('comment.addReport');
