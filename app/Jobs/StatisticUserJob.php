@@ -20,7 +20,7 @@ class StatisticUserJob implements ShouldQueue
      * Create a new job instance.
      */
     public function __construct(
-        public int $userId,
+        public string $userId,
         public StatisticUserJobType $jobType
     ) {
         $this->onQueue(QueueBucket::STATISTICS->value);
@@ -50,7 +50,7 @@ class StatisticUserJob implements ShouldQueue
     }
 
     /**
-     * Initialize user statistics when user is created
+     * Initialize commenter statistics when commenter is created
      */
     private function initializeUserStatistics(StatisticUser $statistic): void
     {

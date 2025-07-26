@@ -59,8 +59,9 @@ class CommentImpl implements CommentRepository
 
         if ($comments->isEmpty()) {
             SetLog::withEvent(LogEvents::FETCHING)
-                ->causedBy($comments)
-                ->performedOn($comments)
+                ->withProperties([
+                    'causer' => $comments
+                ])
                 ->withMessage("No comments yet")
                 ->build();
 
@@ -105,6 +106,14 @@ class CommentImpl implements CommentRepository
 
     public function addLikeByCommenter(string $commentId, Authenticatable $commenter): bool
     {
+        $isLiked = CommentLike::where('comment_id', $commentId)
+            ->where('user_id', $commenter->id)
+            ->exists();
+
+        if ($isLiked) {
+            return true;
+        }
+
         DB::transaction(function () use ($commentId, $commenter) {
             $comment = Comment::find($commentId);
             if (!$comment) {

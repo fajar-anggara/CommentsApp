@@ -151,8 +151,6 @@ class Comment
      */
     public function addLike(string $commentId): JsonResponse
     {
-        $this->authorize('addLike', Comment::class);
-
         SetLog::withEvent(LogEvents::STORING_COMMENTS)
             ->withProperties([
                 'performedOn' => [
@@ -180,7 +178,7 @@ class Comment
         ActivityLogJob::dispatch(
             LogEvents::STORING_COMMENTS,
             $commenter,
-            $comment,
+            new \App\Models\Comment(),
             [
                 'performedOn' => [
                     'class' => Comment::class,

@@ -96,9 +96,8 @@ class Article
             ->buildWithArraySerializer();
 
         SetLog::withEvent(LogEvents::FETCHING)
-            ->causedBy($data)
-            ->performedOn($data)
             ->withProperties([
+                'causer' => $comments,
                 'performedOn' => [
                     'class' => Article::class,
                     'method' => 'getComments',
