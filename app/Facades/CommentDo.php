@@ -11,6 +11,7 @@ use Sentry\Laravel\Facade;
  * @method static findCommentByExternalArticleIdAndTenantId(string $externalArticleId, int $tenantId)
  * @method static findCommentById(string $commentId)
  * @method static addLikeByCommenter(string $commentId, Authenticatable $commenter)
+ * @method static deleteLikeByCommenter(string $commentId,Authenticatable $commenter)
  * @method static findRepliesByCommentId(string $commentId)
  * @method static updateComment(Comment $comment, array $updateData)
  * @method static deleteComment(Comment $comment)

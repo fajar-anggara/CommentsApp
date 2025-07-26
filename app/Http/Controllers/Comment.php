@@ -151,7 +151,7 @@ class Comment
      */
     public function addLike(string $commentId): JsonResponse
     {
-        SetLog::withEvent(LogEvents::STORING_COMMENTS)
+        SetLog::withEvent(LogEvents::STORING)
             ->withProperties([
                 'performedOn' => [
                     'class' => Comment::class,
@@ -176,7 +176,7 @@ class Comment
         }
 
         ActivityLogJob::dispatch(
-            LogEvents::STORING_COMMENTS,
+            LogEvents::STORING,
             $commenter,
             new \App\Models\Comment(),
             [
@@ -194,9 +194,49 @@ class Comment
         ]);
     }
 
-    public function deleteLike()
+    public function deleteLike(string $commentId)
     {
+        SetLog::withEvent(LogEvents::DELETE)
+            ->withProperties([
+                'performedOn' => [
+                    'class' => Comment::class,
+                    'method' => 'deleteLike'
+                ]
+            ])
+            ->withMessage('Prefare to delete like')
+            ->build();
 
+        $commenter = auth()->guard()->user();
+        $comment = CommentDo::deleteLikeByCommenter($commentId, $commenter);
+
+        if (!$comment) {
+            throw new FailedToSavedException(
+                "Gagal menghapus like. Harap coba lagi",
+                [
+                    'user' => $commenter,
+                    'comment' => $comment,
+                    'model' => CommentLike::class
+                ]
+            );
+        }
+
+        ActivityLogJob::dispatch(
+            LogEvents::DELETE,
+            $commenter,
+            new \App\Models\Comment(),
+            [
+                'performedOn' => [
+                    'class' => Comment::class,
+                    'method' => 'deleteLike'
+                ]
+            ],
+            'Berhasil menghapus like'
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Berhasil menghapus like'
+        ]);
     }
     public function addReport()
     {

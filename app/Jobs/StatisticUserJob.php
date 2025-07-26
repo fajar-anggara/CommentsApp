@@ -45,6 +45,12 @@ class StatisticUserJob implements ShouldQueue
                 StatisticUserJobType::INCREMENT_DOWNVOTE_GIVEN => $statistic->increment('total_downVote_comments'),
                 StatisticUserJobType::INCREMENT_LIKES_GIVEN => $statistic->increment('total_liked_comments'),
                 StatisticUserJobType::INCREMENT_REPORTS_MADE => $statistic->increment('total_report_times'),
+
+                StatisticUserJobType::DECREMENT_COMMENTS_CREATED => $statistic->decrement('total_comments_created'),
+                StatisticUserJobType::DECREMENT_UPVOTE_GIVEN => $statistic->decrement('total_upVote_comments'),
+                StatisticUserJobType::DECREMENT_DOWNVOTE_GIVEN => $statistic->decrement('total_downVote_comments'),
+                StatisticUserJobType::DECREMENT_LIKES_GIVEN => $statistic->decrement('total_liked_comments'),
+                StatisticUserJobType::DECREMENT_REPORTS_MADE => $statistic->decrement('total_report_times'),
             };
         });
     }

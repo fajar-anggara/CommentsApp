@@ -149,4 +149,50 @@ class CommentImpl implements CommentRepository
         return true;
     }
 
+    public function deleteLikeByCommenter(string $commentId, Authenticatable $commenter): bool
+    {
+        $isLiked = CommentLike::where('comment_id', $commentId)
+            ->where('user_id', $commenter->id)
+            ->exists();
+
+        if (!$isLiked)
+        {
+            return true;
+        }
+
+        $commentLike = DB::table('comment_likes')
+            ->where('comment_id', $commentId)
+            ->where('user_id', $commenter->id)
+            ->delete();
+
+        if (!$commentLike) {
+            throw new FailedToSavedException(
+                "Gagal menghapus like. Harap coba lagi",
+                [
+                    'user' => $commenter,
+                    'comment' => $commentLike,
+                    'model' => CommentLike::class
+                ]
+            );
+        }
+
+        $comment = Comment::find($commentId);
+        if (!$comment) {
+            throw new CommentNotFoundException(
+                "Komentar tidak ditemukan",
+                [
+                    'comment_id' => $commentId,
+                    'model' => Comment::class
+                ]
+            );
+        }
+
+        $comment->likes_count = $comment->likes_count - 1;
+        $comment->save();
+
+        StatisticUserJob::dispatch($commenter->id, StatisticUserJobType::DECREMENT_LIKES_GIVEN);
+
+        return true;
+    }
+
 }
