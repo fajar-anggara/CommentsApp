@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\LogEvents;
 use App\Exceptions\FailedToSavedException;
+use App\Facades\AuthDo;
 use App\Facades\CommentDo;
 use App\Facades\Fractal;
 use App\Facades\SetLog;
@@ -238,7 +239,7 @@ class Comment
      *      ),
      * )
      */
-    public function deleteLike(string $commentId)
+    public function deleteLike(string $commentId): JsonResponse
     {
         SetLog::withEvent(LogEvents::DELETE)
             ->withProperties([
@@ -336,7 +337,7 @@ class Comment
      *      ),
      * )
      */
-    public function addReport(string $commentId, CommentAddRepotRequest $request)
+    public function addReport(string $commentId, CommentAddRepotRequest $request): JsonResponse
     {
         SetLog::withEvent(LogEvents::STORING)
             ->withProperties([
@@ -427,7 +428,7 @@ class Comment
      *      ),
      * )
      */
-    public function deleteReport(string $commentId)
+    public function deleteReport(string $commentId): JsonResponse
     {
         SetLog::withEvent(LogEvents::DELETE)
             ->withProperties([
@@ -473,9 +474,93 @@ class Comment
             ]
         );
     }
-    public function getCommenterDetails()
-    {
 
+
+    /**
+     * @OA\Get(
+     *     path="/commenters/{commenterId}",
+     *     summary="Get commenter details",
+     *     description="Get commenter details",
+     *     operationId="getCommenterDetails",
+     *     tags={"Commenters"},
+     *     @OA\Parameter(
+     *         description="Commenter's ID",
+     *         in="path",
+     *         name="commenterId",
+     *         required=true,
+     *         example="1",
+     *         @OA\Schema(
+     *             type="string"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *          response=200,
+     *          description="Success to get commenter details",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=true),
+     *              @OA\Property(property="data", type="object", ref="#/components/schemas/CommenterTransformer"),
+     *              @OA\Property(property="message", type="string", example="Berhasil mengambil detail commenter")
+     *          )
+     *      ),
+     *     @OA\Response(
+     *          response=404,
+     *          description="Commenter tidak ditemukan",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=false),
+     *              @OA\Property(property="message", type="string", example="Commenter tidak ditemukan")
+     *          )
+     *      ),
+     *     @OA\Response(
+     *          response=500,
+     *          description="Gagal mengambil detail commenter. Harap coba lagi",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=false),
+     *              @OA\Property(property="message", type="string", example="Gagal mengambil detail commenter. Harap coba lagi")
+     *          )
+     *      ),
+     * )
+     */
+    public function getCommenterDetails(string $commenterId): JsonResponse
+    {
+        SetLog::withEvent(LogEvents::FETCHING_COMMENTER)
+            ->withProperties([
+                'performedOn' => [
+                    'class' => Comment::class,
+                    'method' => 'getCommenterDetails'
+                ]
+            ])
+            ->withMessage('Prefare to get commenter details')
+            ->build();
+
+        $commenter = AuthDo::findCommenterById($commenterId);
+        $data = Fractal::useCommenterTransformer($commenter)
+            ->withIncludes([
+                'badges',
+                'details',
+                'statistics'
+            ])
+            ->buildWithArraySerializer();
+
+        ActivityLogJob::dispatch(
+            LogEvents::FETCHING,
+            $commenter,
+            new \App\Models\Comment(),
+            [
+                'performedOn' => [
+                    'class' => Comment::class,
+                    'method' => 'getCommenterDetails'
+                ]
+            ],
+            'Berhasil mengambil detail commenter'
+        );
+
+        return response()->json(
+            [
+                'success' => true,
+                'message' => 'Berhasil mengambil detail commenter',
+                'data' => $data
+            ]
+        );
     }
     public function upvote()
     {

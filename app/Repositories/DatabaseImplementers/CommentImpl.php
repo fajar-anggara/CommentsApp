@@ -5,13 +5,18 @@ namespace App\Repositories\DatabaseImplementers;
 use App\Enums\CommentStatus;
 use App\Enums\LogEvents;
 use App\Enums\StatisticUserJobType;
+use App\Enums\UserSyncLikeJobType;
 use App\Exceptions\CommentNotFoundException;
 use App\Exceptions\FailedToSavedException;
 use App\Facades\SetLog;
 use App\Jobs\StatisticUserJob;
+use App\Jobs\testingjob;
+use App\Jobs\UserSyncJob;
+use App\Jobs\UserSyncLikeJob;
 use App\Models\Comment;
 use App\Models\CommentLike;
 use App\Models\CommentReport;
+use App\Models\User;
 use App\Repositories\Interfaces\CommentRepository;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Collection;
@@ -116,7 +121,7 @@ class CommentImpl implements CommentRepository
         }
 
         DB::transaction(function () use ($commentId, $commenter) {
-            $comment = Comment::find($commentId);
+            $comment = Comment::with('user')->find($commentId);
             if (!$comment) {
                 throw new CommentNotFoundException(
                     "Komentar tidak ditemukan",
@@ -129,11 +134,11 @@ class CommentImpl implements CommentRepository
             $comment->likes_count = $comment->likes_count + 1;
             $comment->save();
 
-            $useLiked = CommentLike::updateOrCreate([
+            $commentIsLiked = CommentLike::updateOrCreate([
                 'comment_id' => $commentId,
                 'user_id' => $commenter->id
             ]);
-            if (!$useLiked) {
+            if (!$commentIsLiked) {
                 throw new FailedToSavedException(
                     "Gagal menyimpan like. Harap coba lagi",
                     [
@@ -143,6 +148,8 @@ class CommentImpl implements CommentRepository
                     ]
                 );
             }
+
+            UserSyncLikeJob::dispatch($comment->user->id, UserSyncLikeJobType::USER_SYNC_LIKES_INCREMENT)->afterCommit();
         });
 
         StatisticUserJob::dispatch($commenter->id, StatisticUserJobType::INCREMENT_LIKES_GIVEN);
@@ -191,6 +198,8 @@ class CommentImpl implements CommentRepository
 
             $comment->likes_count = $comment->likes_count - 1;
             $comment->save();
+
+            UserSyncLikeJob::dispatch($comment->user->id, UserSyncLikeJobType::USER_SYNC_LIKES_DECREMENT)->afterCommit();
         });
 
         StatisticUserJob::dispatch($commenter->id, StatisticUserJobType::DECREMENT_LIKES_GIVEN);

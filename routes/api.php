@@ -15,7 +15,7 @@ use App\Http\Controllers\Analytics;
 Route::get('/articles/{tenantId}/{articleId}/comments', [Article::class, 'getComments'])->name('article.getComments');
 Route::get('/articles/{articleId}', [Article::class, 'getInfo'])->name('article.getInfo');
 Route::get('/comments/{commentId}/replies', [Comment::class, 'getReplies'])->name('comment.getReplies');
-Route::get('/users/{userId}/comments', [Comment::class, 'getCommenterDetails'])->name('comment.getCommenterDetails');
+Route::get('/users/{commenterId}/details', [Comment::class, 'getCommenterDetails'])->name('comment.getCommenterDetails');
 
 // Authentication endpoints
 Route::prefix('/auth')->group(function () {
@@ -76,15 +76,15 @@ Route::middleware(['auth:sanctum', 'permission:delete comments'])->group(functio
 
 // Moderation
 Route::middleware(['auth:sanctum', 'permission:ban user'])->group(function () {
-    Route::post('/moderation/users/{userId}/ban', [Moderation::class, 'banUser'])->name('moderation.banUser');
-    Route::delete('/moderation/users/{userId}/ban', [Moderation::class, 'unbanUser'])->name('moderation.unbanUser');
-    Route::get('/moderation/users/{userId}/ban-history', [Moderation::class, 'getBanHistory'])->name('moderation.getBanHistory');
+    Route::post('/moderation/users/{commenterId}/ban', [Moderation::class, 'banUser'])->name('moderation.banUser');
+    Route::delete('/moderation/users/{commenterId}/ban', [Moderation::class, 'unbanUser'])->name('moderation.unbanUser');
+    Route::get('/moderation/users/{commenterId}/ban-history', [Moderation::class, 'getBanHistory'])->name('moderation.getBanHistory');
 });
 
 Route::middleware(['auth:sanctum', 'permission:mute user'])->group(function () {
-    Route::post('/moderation/users/{userId}/mute', [Moderation::class, 'muteUser'])->name('moderation.muteUser');
-    Route::delete('/moderation/users/{userId}/mute', [Moderation::class, 'unmuteUser'])->name('moderation.unmuteUser');
-    Route::get('/moderation/users/{userId}/mute-history', [Moderation::class, 'getMuteHistory'])->name('moderation.getMuteHistory');
+    Route::post('/moderation/users/{commenterId}/mute', [Moderation::class, 'muteUser'])->name('moderation.muteUser');
+    Route::delete('/moderation/users/{commenterId}/mute', [Moderation::class, 'unmuteUser'])->name('moderation.unmuteUser');
+    Route::get('/moderation/users/{commenterId}/mute-history', [Moderation::class, 'getMuteHistory'])->name('moderation.getMuteHistory');
 });
 
 Route::middleware(['auth:sanctum', 'permission:hide content'])->group(function () {
@@ -103,14 +103,14 @@ Route::middleware(['auth:sanctum', 'permission:view reports'])->group(function (
 
 // Badges
 Route::middleware(['auth:sanctum', 'permission:badging'])->group(function () {
-    Route::post('/users/{userId}/badges', [Badge::class, 'awardBadge'])->name('badge.awardBadge');
-    Route::delete('/users/{userId}/badges/{badgeId}', [Badge::class, 'revokeBadge'])->name('badge.revokeBadge');
+    Route::post('/users/{commenterId}/badges', [Badge::class, 'awardBadge'])->name('badge.awardBadge');
+    Route::delete('/users/{commenterId}/badges/{badgeId}', [Badge::class, 'revokeBadge'])->name('badge.revokeBadge');
     Route::get('/badges', [Badge::class, 'getBadges'])->name('badge.getBadges');
 });
 
 // Recruiting
 Route::middleware(['auth:sanctum', 'permission:recruiting'])->group(function () {
-    Route::post('/users/{userId}/recruit', [Recruiting::class, 'recruitUser'])->name('recruiting.recruitUser');
+    Route::post('/users/{commenterId}/recruit', [Recruiting::class, 'recruitUser'])->name('recruiting.recruitUser');
     Route::get('/recruiting/invitations', [Recruiting::class, 'getInvitations'])->name('recruiting.getInvitations');
 });
 
