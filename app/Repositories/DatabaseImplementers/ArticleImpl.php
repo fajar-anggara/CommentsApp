@@ -11,27 +11,15 @@ use App\Repositories\Interfaces\ArticleRepository;
 class ArticleImpl implements ArticleRepository
 {
 
-    public function findOrCreateByArticleExternalId(string $url, string $externalArticleId, int $tenantId): ?Article
+    public function findByContext(array $context): Article|bool
     {
-        // exception was handled in tenant repo
-        $tenant = Tenant::findTenantById($tenantId);
-        $article = Article::where('external_article_id', $externalArticleId)->first();
-        if (!$article) {
-            SetLog::withEvent(LogEvents::FETCHING)
-                ->causedBy($tenant)
-                ->performedOn($tenant)
-                ->withProperties([
-                    'external_article_id' => $externalArticleId,
-                    'tenant_id' => $tenant->id,
-                ])
-                ->withMessage("No such article exists - Create instead");
+        $article = Article::where('url', $context['article_url'])
+            ->where('tenant_id', $context['tenant_id'])
+            ->where('external_article_id', $context['external_article_id'])
+            ->first();
 
-            $article = Article::create([
-                'tenant_id' => $tenantId,
-                'external_article_id' => $externalArticleId,
-                'title' => 'Generated Article Title',
-                'url' => $url,
-            ]);
+        if (!$article) {
+            return false;
         }
 
         return $article;

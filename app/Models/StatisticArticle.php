@@ -16,8 +16,8 @@ class StatisticArticle extends Model
         'total_comments',
         'total_active_comments',
         'total_reported_comments',
-        'total_upVote_comments',
-        'total_downVote_comments',
+        'total_upvote_comments',
+        'total_downvote_comments',
         'last_activity_at'
     ];
 
@@ -28,8 +28,8 @@ class StatisticArticle extends Model
         'total_comments' => 'int',
         'total_active_comments' => 'int',
         'total_reported_comments' => 'int',
-        'total_upVote_comments' => 'int',
-        'total_downVote_comments' => 'int',
+        'total_upvote_comments' => 'int',
+        'total_downvote_comments' => 'int',
         'last_activity_at' => 'datetime',
        ];
     }

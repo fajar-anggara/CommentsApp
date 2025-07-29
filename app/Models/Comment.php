@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+
+#[\AllowDynamicProperties]
 class Comment extends Model
 {
     use HasUuids, HasFactory;
@@ -57,11 +59,11 @@ class Comment extends Model
         return $this->hasMany(CommentLike::class, 'comment_id');
     }
 
-    public function upVotes(): HasMany {
+    public function upvotes(): HasMany {
         return $this->hasMany(CommentUpvote::class, 'comment_id');
     }
 
-    public function downVotes(): HasMany {
+    public function downvotes(): HasMany {
         return $this->hasMany(CommentDownvote::class, 'comment_id');
     }
 

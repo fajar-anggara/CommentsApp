@@ -16,8 +16,8 @@ return new class extends Migration
             $table->uuid('user_id');
             $table->foreign('user_id')->references('id')->on('users');
             $table->integer('total_comments_created')->default(0);
-            $table->integer('total_upVote_comments')->default(0);
-            $table->integer('total_downVote_comments')->default(0);
+            $table->integer('total_upvote_comments')->default(0);
+            $table->integer('total_downvote_comments')->default(0);
             $table->integer('total_liked_comments')->default(0);
             $table->integer('total_report_times')->default(0);
             $table->integer('total_comments')->default(0);

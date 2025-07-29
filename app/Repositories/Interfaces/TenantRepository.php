@@ -6,5 +6,7 @@ use App\Models\Tenant;
 
 interface TenantRepository
 {
-    public function findTenantById(int $id): ?Tenant;
+    public function findById(
+        int $id
+    ): Tenant|bool;
 }

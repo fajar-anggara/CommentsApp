@@ -1,5 +1,5 @@
 <?php
-namespace App\Helpers\ExactImplementers;
+namespace App\Helpers;
 
 use App\Enums\LogEvents;
 use App\Helpers\Interfaces\LogHelper as LogHelperInterface;
@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 use Spatie\Activitylog\Models\Activity;
 
-class LogHelperImpl implements LogHelperInterface
+class SetLogHelper
 {
     protected Activity $activity;
     protected ?string $event = LogEvents::DEFAULT->value;

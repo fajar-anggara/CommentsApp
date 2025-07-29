@@ -12,28 +12,13 @@ use App\Repositories\Interfaces\TenantRepository;
 
 class TenantImpl implements TenantRepository
 {
-    public function findTenantById(int $id): ?Tenant
+    public function findById(int $id): Tenant|bool
     {
         $tenant = Tenant::find($id);
-        if (!$tenant) {
-            throw new TenantNotFoundException(
-                "Tenant tidak ditemukan",
-                [
-                    'id' => $id,
-                    'model' => Tenant::class
-                ]
-            );
-        }
 
-        SetLog::withEvent(LogEvents::FETCHING)
-            ->causedBy($tenant)
-            ->performedOn($tenant)
-            ->withProperties([
-                'name' => $tenant->name,
-                'domain' => $tenant->domain,
-                'tenant_id' => $tenant->id,
-                'user_id' => $tenant->user_id,
-            ]);
+        if (!$tenant) {
+            return false;
+        }
 
         return $tenant;
     }

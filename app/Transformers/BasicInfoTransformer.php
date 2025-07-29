@@ -14,8 +14,8 @@ class BasicInfoTransformer extends TransformerAbstract
             'article_id' => $statistics->article_id,
             'total_active_comments' => $statistics->total_active_comments,
             'total_reported_comments' => $statistics->total_reported_comments,
-            'total_upVote_comments' => $statistics->total_upVote_comments,
-            'total_downVote_comments' => $statistics->total_downVote_comments,
+            'total_upvote_comments' => $statistics->total_upvote_comments,
+            'total_downvote_comments' => $statistics->total_downvote_comments,
         ];
     }
 }

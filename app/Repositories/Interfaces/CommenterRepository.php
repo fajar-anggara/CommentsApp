@@ -7,10 +7,20 @@ use Illuminate\Contracts\Auth\Authenticatable;
 
 interface CommenterRepository
 {
-    public function addNewCommenter(array $commenter): User;
-    public function updateCommenter(User $commenter, array $updateData): User;
-    public function deleteCommenter(User $commenter): bool;
-    public function findCommenterById(string $id): ?User;
-    public function findCommenterByEmail(string $email): ?User;
-    public function existsCommenterById(int $id): bool;
+    public function store(
+        array $commenterData
+    ): User|bool;
+    public function update(
+        User $commenter,
+        array $updateData
+    ): User|bool;
+    public function delete(
+        string $commenterId
+    ): bool;
+    public function findById(
+        string $commenterId
+    ): User|bool;
+    public function findByEmail(
+        string $email
+    ): User|bool;
 }

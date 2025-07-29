@@ -26,7 +26,7 @@ class CommentsAddRequest extends FormRequest
             'content' => 'required|string',
             'parent_id' => 'nullable|exists:comments,id',
             'tenant_id' => 'required|exists:tenants,id',
-            'article_id' => 'required|string',
+            'external_article_id' => 'required|string',
             'article_url' => 'required|string',
         ];
     }
@@ -41,7 +41,7 @@ class CommentsAddRequest extends FormRequest
             'parent_id.exists' => 'Parent komentar tidak ditemukan.',
             'tenant_id.required' => 'Tenant id tidak boleh kosong.',
             'tenant_id.exists' => 'Tenant tidak ditemukan',
-            'article_id.required' => 'Article id tidak boleh kosong.',
+            'external_article_id.required' => 'Article id tidak boleh kosong.',
             'article_url.required' => 'Article url tidak boleh kosong.',
         ];
     }

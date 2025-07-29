@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'comments' => [
+        'comment_status_default_creating' => env('COMMENT_STATUS_DEFAULT_CREATING', \App\Enums\CommentStatus::PUBLISHED->value),
+        'comment_status_default_fetching' => env('COMMENT_STATUS_DEFAULT_FETCHING', \App\Enums\CommentStatus::PUBLISHED->value),
+    ]
 ];

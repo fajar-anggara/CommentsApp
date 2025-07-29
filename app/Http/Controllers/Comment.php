@@ -3,19 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Enums\LogEvents;
-use App\Exceptions\FailedToSavedException;
-use App\Facades\AuthDo;
-use App\Facades\CommentDo;
+use App\Exceptions\CommentNotFoundException;
+use App\Facades\Comment as CommentDo;
 use App\Facades\Fractal;
+use App\Facades\Like;
 use App\Facades\SetLog;
+use App\Facades\Voting;
 use App\Http\Requests\CommentAddRepotRequest;
-use App\Jobs\ActivityLogJob;
-use App\Models\CommentLike;
-use App\Models\CommentReport;
+use App\Repositories\Interfaces\CommenterRepository;
 use Illuminate\Http\JsonResponse;
 
 class Comment
 {
+    public function __construct(
+        protected CommenterRepository $commenterRepository,
+    ){}
     /**
      * @OA\Get(
      *     path="/comments/{commentId}/replies",
@@ -74,35 +76,22 @@ class Comment
      */
     public function getReplies(string $commentId): JsonResponse
     {
-        SetLog::withEvent(LogEvents::FETCHING_COMMENTS)
+        SetLog::withEvent(LogEvents::PREPARE)
             ->withProperties([
                 'performedOn' => [
                     'class' => Comment::class,
                     'method' => 'getReplies'
                 ]
             ])
-            ->withMessage('Prefare to get replies')
+            ->withMessage('Prepare to get replies')
             ->build();
 
-        $comments = CommentDo::findRepliesByCommentId($commentId);
-
-        $data = Fractal::useCommentTransformer($comments)
-            ->buildWithArraySerializer();
-
-        SetLog::withEvent(LogEvents::FETCHING_COMMENTS)
-            ->withProperties([
-                'performedOn' => [
-                    'class' => Comment::class,
-                    'method' => 'getReplies'
-                ]
-            ])
-            ->withMessage('Successfully fetched replies')
-            ->build();
+        $comments = CommentDo::getReplies($commentId);
 
         return response()->json([
             'success' => true,
             'message' => 'Berhasil memuat balasan komentar',
-            'data' => $data
+            'data' => Fractal::useCommentTransformer($comments)->buildWithArraySerializer()
         ]);
     }
 
@@ -159,35 +148,10 @@ class Comment
                     'method' => 'addLike'
                 ]
             ])
-            ->withMessage('Prefare to add like')
+            ->withMessage('Prepare to add like')
             ->build();
 
-        $commenter = auth()->guard()->user();
-        $comment = CommentDo::addLikeByCommenter($commentId, $commenter);
-
-        if (!$comment) {
-            throw new FailedToSavedException(
-                "Gagal menyimpan like. Harap coba lagi",
-                [
-                    'user' => $commenter,
-                    'comment' => $comment,
-                    'model' => CommentLike::class
-                ]
-            );
-        }
-
-        ActivityLogJob::dispatch(
-            LogEvents::STORING,
-            $commenter,
-            new \App\Models\Comment(),
-            [
-                'performedOn' => [
-                    'class' => Comment::class,
-                    'method' => 'addLike'
-                ]
-            ],
-            'Berhasil menambah like'
-        );
+        Like::add($commentId, auth()->guard()->user()->id);
 
         return response()->json([
             'success' => true,
@@ -241,42 +205,17 @@ class Comment
      */
     public function deleteLike(string $commentId): JsonResponse
     {
-        SetLog::withEvent(LogEvents::DELETE)
+        SetLog::withEvent(LogEvents::PREPARE)
             ->withProperties([
                 'performedOn' => [
                     'class' => Comment::class,
                     'method' => 'deleteLike'
                 ]
             ])
-            ->withMessage('Prefare to delete like')
+            ->withMessage('Prepare to delete like')
             ->build();
 
-        $commenter = auth()->guard()->user();
-        $comment = CommentDo::deleteLikeByCommenter($commentId, $commenter);
-
-        if (!$comment) {
-            throw new FailedToSavedException(
-                "Gagal menghapus like. Harap coba lagi",
-                [
-                    'user' => $commenter,
-                    'comment' => $comment,
-                    'model' => CommentLike::class
-                ]
-            );
-        }
-
-        ActivityLogJob::dispatch(
-            LogEvents::DELETE,
-            $commenter,
-            new \App\Models\Comment(),
-            [
-                'performedOn' => [
-                    'class' => Comment::class,
-                    'method' => 'deleteLike'
-                ]
-            ],
-            'Berhasil menghapus like'
-        );
+        Like::remove($commentId, auth()->guard()->user()->id);
 
         return response()->json([
             'success' => true,
@@ -339,42 +278,20 @@ class Comment
      */
     public function addReport(string $commentId, CommentAddRepotRequest $request): JsonResponse
     {
-        SetLog::withEvent(LogEvents::STORING)
+        SetLog::withEvent(LogEvents::PREPARE)
             ->withProperties([
                 'performedOn' => [
                     'class' => Comment::class,
                     'method' => 'addReport'
                 ]
             ])
-            ->withMessage('Prefare to add report')
+            ->withMessage('Prepare to add report')
             ->build();
 
-        $validated = $request->validated();
-        $commenter = auth()->guard()->user();
-        $comment = CommentDo::addReportByCommenter($commentId, $commenter, $validated);
-
-        if (!$comment) {
-            throw new FailedToSavedException(
-                "Gagal menyimpan laporan. Harap coba lagi",
-                [
-                    'user' => $commenter,
-                    'comment' => $comment,
-                    'model' => CommentReport::class
-                ]
-            );
-        }
-
-        ActivityLogJob::dispatch(
-            LogEvents::STORING,
-            $commenter,
-            new \App\Models\Comment(),
-            [
-                'performedOn' => [
-                    'class' => Comment::class,
-                    'method' => 'addReport'
-                ]
-            ],
-            'Berhasil mereport komentar'
+        CommentDo::addReport(
+            $commentId,
+            auth()->guard()->user()->id,
+            $request->validated()['reason']
         );
 
         return response()->json(
@@ -430,41 +347,19 @@ class Comment
      */
     public function deleteReport(string $commentId): JsonResponse
     {
-        SetLog::withEvent(LogEvents::DELETE)
+        SetLog::withEvent(LogEvents::PREPARE)
             ->withProperties([
                 'performedOn' => [
                     'class' => Comment::class,
                     'method' => 'deleteReport'
                 ]
             ])
-            ->withMessage('Prefare to delete report')
+            ->withMessage('Prepare to delete report')
             ->build();
 
-        $commenter = auth()->guard()->user();
-        $comment = CommentDo::deleteReportByCommenter($commentId, $commenter);
-
-        if (!$comment) {
-            throw new FailedToSavedException(
-                "Gagal menghapus report komentar. Harap coba lagi",
-                [
-                    'user' => $commenter,
-                    'comment' => $comment,
-                    'model' => CommentReport::class
-                ]
-            );
-        }
-
-        ActivityLogJob::dispatch(
-            LogEvents::DELETE,
-            $commenter,
-            new \App\Models\Comment(),
-            [
-                'performedOn' => [
-                    'class' => Comment::class,
-                    'method' => 'deleteReport'
-                ]
-            ],
-            'Berhasil menghapus report komentar'
+        CommentDo::deleteReport(
+            $commentId,
+            auth()->guard()->user()->id
         );
 
         return response()->json(
@@ -522,6 +417,26 @@ class Comment
      */
     public function getCommenterDetails(string $commenterId): JsonResponse
     {
+        SetLog::withEvent(LogEvents::PREPARE)
+            ->withProperties([
+                'performedOn' => [
+                    'class' => Comment::class,
+                    'method' => 'getCommenterDetails'
+                ]
+            ])
+            ->withMessage('Prepare to get commenter details')
+            ->build();
+
+        $commenter = $this->commenterRepository->findById($commenterId);
+        if (!$commenter) {
+            throw new CommentNotFoundException(
+                "User tidak ditemukan",
+                [
+                    'commenter_id' => $commenterId
+                ]
+            );
+        }
+
         SetLog::withEvent(LogEvents::FETCHING_COMMENTER)
             ->withProperties([
                 'performedOn' => [
@@ -529,50 +444,94 @@ class Comment
                     'method' => 'getCommenterDetails'
                 ]
             ])
-            ->withMessage('Prefare to get commenter details')
+            ->withMessage('Fetching commenter')
             ->build();
-
-        $commenter = AuthDo::findCommenterById($commenterId);
-        $data = Fractal::useCommenterTransformer($commenter)
-            ->withIncludes([
-                'badges',
-                'details',
-                'statistics'
-            ])
-            ->buildWithArraySerializer();
-
-        ActivityLogJob::dispatch(
-            LogEvents::FETCHING,
-            $commenter,
-            new \App\Models\Comment(),
-            [
-                'performedOn' => [
-                    'class' => Comment::class,
-                    'method' => 'getCommenterDetails'
-                ]
-            ],
-            'Berhasil mengambil detail commenter'
-        );
 
         return response()->json(
             [
                 'success' => true,
                 'message' => 'Berhasil mengambil detail commenter',
-                'data' => $data
+                'data' => Fractal::useCommenterTransformer($commenter)
+                    ->withIncludes([
+                        'badges',
+                        'details',
+                        'statistics'
+                    ])
+                    ->buildWithArraySerializer()
             ]
         );
     }
-    public function upvote()
+    public function upvote(string $commentId): JsonResponse
     {
+        SetLog::withEvent(LogEvents::PREPARE)
+            ->withProperties([
+                'performedOn' => [
+                    'class' => Comment::class,
+                    'method' => 'upvote'
+                ]
+            ])
+            ->withMessage('Prepare to upvote')
+            ->build();
 
+        Voting::upvote(
+            $commentId,
+            auth()->guard()->user()->id
+        );
+
+        return response()->json(
+            [
+                'success' => true,
+                'message' => 'Berhasil upvote'
+            ]);
     }
-    public function downVote()
-    {
 
+    public function downvote(string $commentId): JsonResponse
+    {
+        SetLog::withEvent(LogEvents::FETCHING)
+            ->withProperties([
+                'performedOn' => [
+                    'class' => Comment::class,
+                    'method' => 'downvote'
+                ]
+            ])
+            ->withMessage('Prepare to downvote')
+            ->build();
+
+        Voting::downvote(
+            $commentId,
+            auth()->guard()->user()->id
+        );
+
+        return response()->json(
+            [
+                'success' => true,
+                'message' => 'Berhasil downvote'
+            ]);
     }
-    public function removeVote()
-    {
 
+    public function removeVote(string $commentId, string $upOrDownVote): JsonResponse
+    {
+        SetLog::withEvent(LogEvents::DELETE)
+            ->withProperties([
+                'performedOn' => [
+                    'class' => Comment::class,
+                    'method' => 'removeVote'
+                ]
+            ])
+            ->withMessage('Prepare to remove vote')
+            ->build();
+
+        Voting::remove(
+            $commentId,
+            auth()->guard()->user()->id,
+            $upOrDownVote
+        );
+
+        return response()->json(
+            [
+                'success' => true,
+                'message' => 'Berhasil remove vote'
+            ]);
     }
     public function getThread()
     {

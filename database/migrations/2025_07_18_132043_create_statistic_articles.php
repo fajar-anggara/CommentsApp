@@ -17,8 +17,8 @@ return new class extends Migration
             $table->foreign('article_id')->references('id')->on('articles')->onDelete('cascade');
             $table->integer('total_active_comments')->default(0);
             $table->integer('total_reported_comments')->default(0);
-            $table->integer('total_upVote_comments')->default(0);
-            $table->integer('total_downVote_comments')->default(0);
+            $table->integer('total_upvote_comments')->default(0);
+            $table->integer('total_downvote_comments')->default(0);
             $table->timestamps();
         });
     }

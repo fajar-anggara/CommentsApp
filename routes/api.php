@@ -55,8 +55,8 @@ Route::middleware(['auth:sanctum', 'permission:create comments|delete comments|u
     Route::delete('/comments/{commentId}/report', [Comment::class, 'deleteReport'])->name('comment.deleteReport');
 
     Route::post('/comments/{commentId}/upvote', [Comment::class, 'upvote'])->name('comment.upvote');
-    Route::post('/comments/{commentId}/downVote', [Comment::class, 'downVote'])->name('comment.downVote');
-    Route::delete('/comments/{commentId}/vote', [Comment::class, 'removeVote'])->name('comment.removeVote');
+    Route::post('/comments/{commentId}/downvote', [Comment::class, 'downvote'])->name('comment.downvote');
+    Route::delete('/comments/{commentId}/{upOrDown}/vote', [Comment::class, 'removeVote'])->name('comment.removeVote');
 
     Route::post('/articles/comments', [Article::class, 'addComment'])->name('article.addComment');
     Route::post('/comments/{commentId}/replies', [Comment::class, 'addReply'])->name('comment.addReply');

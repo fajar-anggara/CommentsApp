@@ -13,6 +13,8 @@ use Illuminate\Contracts\Auth\Authenticatable;
  * @method static useCommentTransformer(Collection $comments);
  * @method static withIncludes(array $includes): FractalHelper
  * @method static buildWithArraySerializer(): void
+ *
+ * @see \App\Helpers\FractalHelper
  */
 class Fractal extends Facade
 {

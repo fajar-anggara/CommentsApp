@@ -47,8 +47,8 @@ class StatisticUserJob implements ShouldQueue
                     $statistic
                 ),
                 StatisticUserJobType::INITIALIZE_USER_STATISTICS => $this->initializeUserStatistics($statistic),
-                StatisticUserJobType::INCREMENT_UPVOTE_GIVEN => $statistic->increment('total_upVote_comments'),
-                StatisticUserJobType::INCREMENT_DOWNVOTE_GIVEN => $statistic->increment('total_downVote_comments'),
+                StatisticUserJobType::INCREMENT_UPVOTE_GIVEN => $statistic->increment('total_upvote_comments'),
+                StatisticUserJobType::INCREMENT_DOWNVOTE_GIVEN => $statistic->increment('total_downvote_comments'),
                 StatisticUserJobType::INCREMENT_LIKES_GIVEN => $statistic->increment('total_liked_comments'),
                 StatisticUserJobType::INCREMENT_REPORTS_MADE => $statistic->increment('total_report_times'),
 
@@ -56,8 +56,8 @@ class StatisticUserJob implements ShouldQueue
                     'decrement',
                     $statistic
                 ),
-                StatisticUserJobType::DECREMENT_UPVOTE_GIVEN => $statistic->decrement('total_upVote_comments'),
-                StatisticUserJobType::DECREMENT_DOWNVOTE_GIVEN => $statistic->decrement('total_downVote_comments'),
+                StatisticUserJobType::DECREMENT_UPVOTE_GIVEN => $statistic->decrement('total_upvote_comments'),
+                StatisticUserJobType::DECREMENT_DOWNVOTE_GIVEN => $statistic->decrement('total_downvote_comments'),
                 StatisticUserJobType::DECREMENT_LIKES_GIVEN => $statistic->decrement('total_liked_comments'),
                 StatisticUserJobType::DECREMENT_REPORTS_MADE => $statistic->decrement('total_report_times'),
             };

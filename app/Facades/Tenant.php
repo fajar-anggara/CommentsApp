@@ -5,7 +5,9 @@ namespace App\Facades;
 use Sentry\Laravel\Facade;
 
 /**
- * @method static findTenantById(int $tenantId)
+ * @method static findById(int $tenantId)
+ *
+ * @see \App\Helpers\TenantHelper
  */
 class Tenant extends Facade
 {

@@ -7,5 +7,7 @@ use App\Models\Article;
 
 interface ArticleRepository
 {
-    public function findOrCreateByArticleExternalId(string $url, string $externalArticleId, int $tenantId): ?Article;
+    public function findByContext(
+        array $context
+    ): Article|bool;
 }

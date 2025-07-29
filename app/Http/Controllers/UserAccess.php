@@ -3,13 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Enums\LogEvents;
-use App\Facades\AuthDo;
+use App\Facades\Auth;
 use App\Facades\Fractal;
 use App\Facades\SetLog;
 use App\Http\Requests\CommenterUpdateRequest;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Arr;
-use OpenApi\Annotations as OA;
 
 /**
  * UserAccess Controller
@@ -70,9 +68,7 @@ class UserAccess
      */
     public function me(): JsonResponse
     {
-        SetLog::withEvent(LogEvents::FETCHING_COMMENTER)
-            ->causedBy(auth()->guard()->user())
-            ->performedOn(auth()->guard()->user())
+        SetLog::withEvent(LogEvents::PREPARE)
             ->withProperties([
                 'performedOn' => [
                     'class' => UserAccess::class,
@@ -82,18 +78,16 @@ class UserAccess
             ->withMessage("Fetching commenter from guard - sanctum")
             ->build();
 
-        $data = Fractal::useCommenterTransformer(auth()->guard()->user())
-            ->withIncludes([
-                'details',
-                'statistics',
-                'comments'
-            ])
-            ->buildWithArraySerializer();
-
         return response()->json([
             'success' => true,
             'message' => "Berhasil memuat data",
-            'data' => $data
+            'data' => Fractal::useCommenterTransformer(auth()->guard()->user())
+                ->withIncludes([
+                    'details',
+                    'statistics',
+                    'comments'
+                ])
+                ->buildWithArraySerializer()
         ]);
     }
 
@@ -148,10 +142,7 @@ class UserAccess
      */
     public function profile(CommenterUpdateRequest $request): JsonResponse
     {
-        $validated = $request->validated();
-        SetLog::withEvent(LogEvents::UPDATE)
-            ->causedBy(auth()->guard()->user())
-            ->performedOn(auth()->guard()->user())
+        SetLog::withEvent(LogEvents::PREPARE)
             ->withProperties([
                 'performedOn' => [
                     'class' => UserAccess::class,
@@ -161,31 +152,19 @@ class UserAccess
             ->withMessage("Prepare to update profile commenter")
             ->build();
 
-        $commenter = AuthDo::findCommenterById(auth()->guard()->user()->id);
-        $updatedData = AuthDo::updateCommenter($commenter, $validated);
-
-        Fractal::useCommenterTransformer($commenter)
-            ->withIncludes([
-                'details',
-            ])
-            ->buildWithArraySerializer();
-
-        SetLog::withEvent(LogEvents::UPDATE)
-            ->causedBy($commenter)
-            ->performedOn($commenter)
-            ->withProperties([
-                'performedOn' => [
-                    'class' => UserAccess::class,
-                    'method' => 'profile'
-                ]
-            ])
-            ->withMessage("Profile commenter updated successfully")
-            ->build();
+        $updated = Auth::update(
+            auth()->guard()->user()->id,
+            $request->validated()
+        );
 
         return response()->json([
             'success' => true,
             'message' => "Berhasil update data",
-            'data' => $updatedData
+            'data' => Fractal::useCommenterTransformer($updated)
+                ->withIncludes([
+                    'details',
+                ])
+                ->buildWithArraySerializer()
         ]);
     }
 
@@ -227,12 +206,12 @@ class UserAccess
      *
      * @return \Illuminate\Http\JsonResponse
      * @throws \Illuminate\Auth\AuthenticationException
+     *
+     * TODO: perbaharui return dan response dari beberapa controller jadul
      */
     public function deleteAccount(): JsonResponse
     {
-        SetLog::withEvent(LogEvents::DELETE)
-            ->causedBy(auth()->guard()->user())
-            ->performedOn(auth()->guard()->user())
+        SetLog::withEvent(LogEvents::PREPARE)
             ->withProperties([
                 'performedOn' => [
                     'class' => UserAccess::class,
@@ -242,20 +221,7 @@ class UserAccess
             ->withMessage("Prepare to delete account commenter")
             ->build();
 
-        $commenter = AuthDo::findCommenterById(auth()->guard()->user()->id);
-        AuthDo::deleteCommenter($commenter);
-
-        SetLog::withEvent(LogEvents::DELETE)
-            ->causedBy($commenter)
-            ->performedOn($commenter)
-            ->withProperties([
-                'performedOn' => [
-                    'class' => UserAccess::class,
-                    'method' => 'deleteAccount'
-                ]
-            ])
-            ->withMessage("Account commenter deleted successfully")
-            ->build();
+        Auth::delete(auth()->guard()->user()->id);
 
         return response()->json([
             'success' => true,

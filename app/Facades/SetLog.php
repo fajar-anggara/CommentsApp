@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Facade;
  * @method static performedOn(Model $model): LogHelper
  * @method static build(): void
  * @method static cleanLogs(): void
+ *
+ * @see \App\Helpers\SetLogHelper
  */
 class SetLog extends Facade
 {

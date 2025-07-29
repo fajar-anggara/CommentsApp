@@ -13,8 +13,8 @@ class StatisticUser extends Model
     protected $fillable = [
         'user_id',
         'total_comments_created',
-        'total_upVote_comments',
-        'total_downVote_comments',
+        'total_upvote_comments',
+        'total_downvote_comments',
         'total_liked_comments',
         'total_report_times',
         'total_comments',
@@ -25,8 +25,8 @@ class StatisticUser extends Model
     {
         return [
             'total_comments_created' => 'int',
-            'total_upVote_comments' => 'int',
-            'total_downVote_comments' => 'int',
+            'total_upvote_comments' => 'int',
+            'total_downvote_comments' => 'int',
             'total_liked_comments' => 'int',
             'total_report_times' => 'int',
             'total_comments' => 'int',

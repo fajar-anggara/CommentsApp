@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Helpers\ExactImplementers;
+namespace App\Helpers;
 
 use App\Helpers\Interfaces\FractalHelper;
 use App\Transformers\CommentTransformer;
@@ -12,7 +12,7 @@ use League\Fractal\Resource\Item;
 use League\Fractal\Serializer\ArraySerializer;
 
 
-class FractalHelperImpl implements FractalHelper
+class FractalHelper
 {
 
     /**

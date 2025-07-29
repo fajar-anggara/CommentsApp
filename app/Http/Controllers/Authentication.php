@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\LogEvents;
 use App\Exceptions\CommenterExceptions\WrongCredentialsException;
-use App\Facades\AuthDo;
+use App\Facades\Auth;
 use App\Facades\Fractal;
 use App\Facades\SetLog;
 use App\Http\Requests\CommenterLoginRequest;
@@ -76,9 +76,8 @@ class Authentication
 
     public function register(CommenterRegisterRequest $request): JsonResponse
     {
-        SetLog::withEvent(LogEvents::REGISTER)
+        SetLog::withEvent(LogEvents::PREPARE)
             ->withProperties([
-                'causer' => Arr::only($request->validated(), ['name', 'email']),
                 'performedOn' => [
                     'class' => Authentication::class,
                     'method' => 'register'
@@ -87,30 +86,14 @@ class Authentication
             ->withMessage('Prepare to register a new commenter')
             ->build();
 
-        $validated = $request->validated();
-        $commenter = AuthDo::addNewCommenter($validated);
-        $token = $commenter->createToken('register_commenter')->plainTextToken;
-
-        $data = Fractal::useCommenterTransformer($commenter, $token)
-            ->withIncludes(['details'])
-            ->buildWithArraySerializer();
-
-        SetLog::withEvent(LogEvents::REGISTER)
-            ->causedBy($commenter)
-            ->performedOn($commenter)
-            ->withProperties([
-                'performedOn' => [
-                    'class' => Authentication::class,
-                    'method' => 'register'
-                ]
-            ])
-            ->withMessage('Commenter registered successfully')
-            ->build();
+        $commenter = Auth::register($request->validated());
 
         return response()->json([
             'success' => true,
             'message' => 'Berhasil register Commenter',
-            'data' => $data,
+            'data' => Fractal::useCommenterTransformer($commenter['data'], $commenter['token'])
+                ->withIncludes(['details'])
+                ->buildWithArraySerializer(),
         ], 201);
     }
 
@@ -159,9 +142,8 @@ class Authentication
      */
     public function login(CommenterLoginRequest $request): JsonResponse
     {
-        SetLog::withEvent(LogEvents::LOGIN)
+        SetLog::withEvent(LogEvents::PREPARE)
             ->withProperties([
-                'causer' => Arr::only($request->validated(), ['email']),
                 'performedOn' => [
                     'class' => Authentication::class,
                     'method' => 'login'
@@ -170,48 +152,15 @@ class Authentication
             ->withMessage('Prepare to login a commenter')
             ->build();
 
-        $validated = $request->validated();
-        $commenter = AuthDo::findCommenterByEmail($validated['email']);
-
-        if (!$commenter || !Hash::check($validated['password'], $commenter->password)) {
-            SetLog::withEvent(LogEvents::LOGIN)
-                ->withProperties([
-                    'email' => $validated["email"],
-                    'performedOn' => [
-                        'class' => Authentication::class,
-                        'method' => 'login'
-                    ]
-                ])
-                ->withMessage('Commenter login failed: wrong email or password')
-                ->build();
-
-            throw new WrongCredentialsException(
-                'Email atau password salah',
-                ['email' => $validated['email']]
-            );
-        }
-
-        $commenter->tokens()->delete();
-        $token = $commenter->createToken('login_commenter')->plainTextToken;
-        $data = Fractal::useCommenterTransformer($commenter, $token)
-            ->buildWithArraySerializer();
-
-        SetLog::withEvent(LogEvents::LOGIN)
-            ->causedBy($commenter)
-            ->performedOn($commenter)
-            ->withProperties([
-                'performedOn' => [
-                    'class' => Authentication::class,
-                    'method' => 'login'
-                ]
-            ])
-            ->withMessage('Commenter login successfully')
-            ->build();
+        $commenter = Auth::login($request->validated());
 
         return response()->json([
             'success' => true,
             'message' => 'Berhasil login',
-            'data' => $data,
+            'data' => Fractal::useCommenterTransformer(
+                $commenter['data'],
+                $commenter['token']
+            )->buildWithArraySerializer()
         ]);
     }
 
@@ -244,9 +193,8 @@ class Authentication
      */
     public function logout(Request $request): JsonResponse
     {
-        SetLog::withEvent(LogEvents::LOGOUT)
+        SetLog::withEvent(LogEvents::PREPARE)
             ->withProperties([
-                'causer' => ['name' => $request->user()->name],
                 'performedOn' => [
                     'class' => Authentication::class,
                     'method' => 'logout'
@@ -259,7 +207,6 @@ class Authentication
 
         SetLog::withEvent(LogEvents::LOGOUT)
             ->causedBy($request->user())
-            ->performedOn($request->user())
             ->withProperties([
                 'performedOn' => [
                     'class' => Authentication::class,
@@ -309,9 +256,8 @@ class Authentication
      */
     public function refresh(Request $request): JsonResponse
     {
-        SetLog::withEvent(LogEvents::REFRESH_TOKEN)
+        SetLog::withEvent(LogEvents::PREPARE)
             ->withProperties([
-                'causer' => ['name' => $request->user()->name],
                 'performedOn' => [
                     'class' => Authentication::class,
                     'method' => 'refresh'
@@ -325,7 +271,6 @@ class Authentication
 
         SetLog::withEvent(LogEvents::REFRESH_TOKEN)
             ->causedBy($request->user())
-            ->performedOn($request->user())
             ->withProperties([
                 'performedOn' => [
                     'class' => Authentication::class,

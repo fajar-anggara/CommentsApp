@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\LogEvents;
 use App\Enums\StatisticArticleJobType;
-use App\Facades\CommentDo;
+use App\Facades\Comment;
 use App\Facades\Fractal;
 use App\Facades\SetLog;
 use App\Http\Requests\CommentsAddRequest;
@@ -78,7 +78,7 @@ class Article
      */
     public function getComments($tenantId, $articleId): JsonResponse
     {
-        SetLog::withEvent(LogEvents::FETCHING_COMMENTS)
+        SetLog::withEvent(LogEvents::PREPARE)
             ->withProperties([
                 'performedOn' => [
                     'class' => Article::class,
@@ -87,30 +87,17 @@ class Article
             ])
             ->withMessage("Prepare to get comments");
 
-        $comments = CommentDo::findCommentByExternalArticleIdAndTenantId(
+        $comments = Comment::getByArticleAndTenantId(
             $articleId,
             $tenantId
         );
-
-        $data = Fractal::useCommentTransformer($comments)
-            ->buildWithArraySerializer();
-
-        SetLog::withEvent(LogEvents::FETCHING)
-            ->withProperties([
-                'causer' => $comments,
-                'performedOn' => [
-                    'class' => Article::class,
-                    'method' => 'getComments',
-                ]
-            ])
-            ->withMessage("Fetch comments successfully");
 
         addStatisticArticle::dispatch($articleId, StatisticArticleJobType::INCREMENT_VIEWS);
 
         return response()->json([
             'success' => true,
             'message' => 'Berhasil memuat komentar',
-            'data' => $data
+            'data' => Fractal::useCommentTransformer($comments)->buildWithArraySerializer()
         ]);
     }
 
@@ -150,7 +137,7 @@ class Article
     public function addComment(CommentsAddRequest $request): JsonResponse
     {
         $commenter = auth()->guard()->user();
-        SetLog::withEvent(LogEvents::CREATE_COMMENTS)
+        SetLog::withEvent(LogEvents::PREPARE)
             ->causedBy($commenter)
             ->withProperties([
                 'performedOn' => [
@@ -159,33 +146,10 @@ class Article
                 ]
             ])
             ->withMessage("Prepare to add a comment");
-        $validated = $request->validated();
 
-        $article = ArticleDo::findOrCreateByArticleExternalId(
-            $validated['article_url'],
-            $validated['article_id'],
-            $validated['tenant_id'],
-        );
+        Comment::store($request->validated());
 
-        $comment = CommentDo::addNewComment(
-            $validated,
-            $article->id,
-            $commenter,
-        );
-
-
-        SetLog::withEvent(LogEvents::CREATE_COMMENTS)
-            ->causedBy($commenter)
-            ->performedOn($comment)
-            ->withProperties([
-                'performedOn' => [
-                    'class' => Article::class,
-                    'method' => 'addComment',
-                ]
-            ])
-            ->withMessage("Comment added successfully");
-
-        addStatisticArticle::dispatch($article->id, StatisticArticleJobType::INCREMENT_COMMENTS_COUNT);
+        addStatisticArticle::dispatch($request->article_id, StatisticArticleJobType::INCREMENT_COMMENTS_COUNT);
 
         return response()->json([
             'success' => true,

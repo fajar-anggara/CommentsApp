@@ -77,12 +77,12 @@ class User extends Authenticatable
         return $this->belongsTo(Badge::class);
     }
 
-    public function upVotes(): HasMany
+    public function upvotes(): HasMany
     {
         return $this->hasMany(CommentUpVote::class);
     }
 
-    public function downVotes(): HasMany
+    public function downvotes(): HasMany
     {
         return $this->hasMany(CommentDownVote::class);
     }

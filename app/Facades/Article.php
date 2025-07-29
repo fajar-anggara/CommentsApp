@@ -5,7 +5,9 @@ namespace App\Facades;
 use Sentry\Laravel\Facade;
 
 /**
- * @method static findOrCreateByArticleExternalId(string $url, string $externalArticleId, int $tenantId);
+ * @method static findByContext(array $context);
+ *
+ * @see \App\Helpers\ArticleHelper
  */
 class Article extends Facade
 {

@@ -23,6 +23,8 @@ return new class extends Migration
             $table->string('bio')->nullable();
             $table->integer('total_comments_created')->default(0);
             $table->integer('total_likes_acquired')->default(0);
+            $table->integer('total_upvote_acquired')->default(0);
+            $table->integer('total_downvote_acquired')->default(0);
             $table->boolean('is_muted')->default(false);
             $table->boolean('is_banned')->default(false);
             $table->uuid('badge_id')->nullable();
